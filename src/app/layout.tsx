@@ -32,7 +32,8 @@ export const metadata: Metadata = {
     images: ['https://edcorner.co.uk/wp-content/uploads/2026/04/ed-corner-og.jpg'],
   },
   icons: {
-    icon: '/favicon.svg',
+    icon: 'https://edcorner.co.uk/wp-content/uploads/2026/03/cropped-Untitled-design-6.png',
+    shortcut: 'https://edcorner.co.uk/wp-content/uploads/2026/03/cropped-Untitled-design-6.png',
   },
 }
 
