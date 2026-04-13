@@ -674,6 +674,121 @@ a { color: inherit; text-decoration: none; }
   to { transform: translateX(-50%); }
 }
 
+/* ===== BENTO GRID ===== */
+.bento-section {
+  max-width: 1400px;
+  margin: 80px auto 0;
+  padding: 0 24px;
+}
+
+.bento-headline {
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #111;
+  margin: 0 0 32px;
+  text-align: center;
+}
+
+.bento-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.bento-card {
+  position: relative;
+  background: #fff;
+  border-radius: 24px;
+  padding: 32px;
+  border: 1px solid rgba(0,0,0,0.06);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  text-decoration: none;
+  color: inherit;
+  overflow: hidden;
+}
+
+.bento-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.08);
+}
+
+.bento-card--upcoming {
+  background: #f9f9f7;
+  border-color: rgba(0,0,0,0.04);
+}
+
+.bento-badge {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: #ccff00;
+  color: #111;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  letter-spacing: 0.02em;
+}
+
+.bento-icon {
+  font-size: 32px;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.bento-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #888;
+}
+
+.bento-title {
+  font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #111;
+  margin: 0;
+}
+
+.bento-desc {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #555;
+  margin: 4px 0 0;
+  flex: 1;
+}
+
+.bento-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #111;
+  margin-top: 12px;
+}
+
+.bento-arrow {
+  transition: transform 0.2s ease;
+}
+
+.bento-card:hover .bento-arrow {
+  transform: translateX(3px);
+}
+
+@media (max-width: 768px) {
+  .bento-grid { grid-template-columns: 1fr; }
+  .bento-card { padding: 26px; }
+  .bento-section { margin-top: 60px; }
+}
+
 /* ===== FOOTER ===== */
 .site-footer {
   background: #111;

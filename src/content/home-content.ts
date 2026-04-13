@@ -177,4 +177,8 @@ export const homeContent = {
       },
     ],
   },
+
+  bentoGrid: {
+    headline: 'More from Ed',
+  },
 } as const
