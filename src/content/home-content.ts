@@ -179,6 +179,6 @@ export const homeContent = {
   },
 
   bentoGrid: {
-    headline: 'More from Ed',
+    headline: 'Other Projects',
   },
 } as const

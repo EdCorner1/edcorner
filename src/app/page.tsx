@@ -85,9 +85,9 @@ export default function HomePage() {
       </section>
 
       <VideoTicker videos={videoTicker.videos} />
+      <ContentTabs headline={contentTabs.headline} tabs={contentTabs.tabs} />
       <CreatorCards headline={creatorCards.headline} items={creatorCards.items} />
       <BentoGrid headline={homeContent.bentoGrid.headline} />
-      <ContentTabs headline={contentTabs.headline} tabs={contentTabs.tabs} />
 
       <section id="faq" className="spacer" />
       <section id="getintouch" className="spacer" />
