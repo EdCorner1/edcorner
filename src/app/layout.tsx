@@ -11,7 +11,29 @@ const bricolage = Bricolage_Grotesque({
 
 export const metadata: Metadata = {
   title: 'Ed Corner — UGC & Tech Creator',
-  description: 'UGC and creator-led content for tech, AI and SaaS brands.',
+  description: 'UGC and creator-led content for tech, AI and SaaS brands. 6 years experience in product design, marketing and conversion rate optimisation.',
+  openGraph: {
+    title: 'Ed Corner — UGC & Tech Creator',
+    description: 'UGC and creator-led content for tech, AI and SaaS brands.',
+    type: 'website',
+    siteName: 'Ed Corner',
+    images: [{
+      url: 'https://edcorner.co.uk/wp-content/uploads/2026/04/ed-corner-og.jpg',
+      width: 1200,
+      height: 630,
+      alt: 'Ed Corner — UGC & Tech Creator',
+    }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Ed Corner — UGC & Tech Creator',
+    description: 'UGC and creator-led content for tech, AI and SaaS brands.',
+    creator: '@DefinitelyEd',
+    images: ['https://edcorner.co.uk/wp-content/uploads/2026/04/ed-corner-og.jpg'],
+  },
+  icons: {
+    icon: '/favicon.svg',
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

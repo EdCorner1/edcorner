@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 type TabVideo = {
   url: string
@@ -18,6 +18,48 @@ type ContentTabsProps = {
   tabs: readonly ContentTab[]
 }
 
+function LazyVideo({ src, index }: { src: string; index: number }) {
+  const [isLoaded, setIsLoaded] = useState(false)
+  const wrapperRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const el = wrapperRef.current
+    if (!el) return
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsLoaded(true)
+          observer.disconnect()
+        }
+      },
+      { rootMargin: '100px' }
+    )
+
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+
+  return (
+    <div ref={wrapperRef}>
+      {isLoaded ? (
+        <video
+          src={`${src}#t=1`}
+          controls
+          playsInline
+          preload="metadata"
+          className="content-tab-video-el"
+        />
+      ) : (
+        <div
+          className="content-tab-video-el content-tab-video-placeholder"
+          aria-label="Loading video..."
+        />
+      )}
+    </div>
+  )
+}
+
 export default function ContentTabs({ headline, tabs }: ContentTabsProps) {
   const [activeTab, setActiveTab] = useState(tabs[0]?.id ?? '')
 
@@ -25,7 +67,6 @@ export default function ContentTabs({ headline, tabs }: ContentTabsProps) {
 
   const visibleVideos = useMemo(() => {
     if (!current) return [] as TabVideo[]
-
     return [...current.videos]
       .sort((a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime())
       .slice(0, 12)
@@ -58,7 +99,7 @@ export default function ContentTabs({ headline, tabs }: ContentTabsProps) {
       <div className="content-tabs-grid" role="tabpanel" aria-label={current.label}>
         {visibleVideos.map((video, index) => (
           <article className="content-tab-video" key={`${current.id}-${video.url}-${index}`}>
-            <video src={`${video.url}#t=1`} controls playsInline preload="metadata" />
+            <LazyVideo src={video.url} index={index} />
           </article>
         ))}
       </div>
