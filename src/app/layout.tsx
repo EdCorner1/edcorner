@@ -3,6 +3,7 @@ import { Bricolage_Grotesque } from 'next/font/google'
 import SiteHeader from '@/components/layout/site-header'
 import './globals.css'
 import { SpeedInsights } from '@vercel/speed-insights/next'
+import { Analytics } from '@vercel/analytics/react'
 
 const bricolage = Bricolage_Grotesque({
   subsets: ['latin'],
@@ -45,6 +46,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <SiteHeader />
         <main>{children}</main>
         <SpeedInsights />
+        <Analytics />
 
         {/* Cal.com embed — enables header button (data-cal-link) and contact section inline widget */}
         <script
