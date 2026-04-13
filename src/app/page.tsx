@@ -1,6 +1,7 @@
 import ContentTabs from '@/components/sections/content-tabs'
 import CreatorCards from '@/components/sections/creator-cards'
 import VideoTicker from '@/components/sections/video-ticker'
+import SiteFooter from '@/components/sections/site-footer'
 import { homeContent } from '@/content/home-content'
 
 export default function HomePage() {
@@ -88,6 +89,7 @@ export default function HomePage() {
 
       <section id="faq" className="spacer" />
       <section id="getintouch" className="spacer" />
+      <SiteFooter />
     </>
   )
 }
