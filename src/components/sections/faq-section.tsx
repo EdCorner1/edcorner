@@ -11,7 +11,7 @@ const faqs: FaqItem[] = [
   {
     question: 'What is UGC?',
     answer:
-      'UGC stands for User Generated Content — but in the creator world it means brand-sponsored content that feels organic and authentic. Unlike traditional ads, UGC is created by real creators who genuinely use and believe in the product. It lives on the creator\'s platform (TikTok, Instagram, YouTube) and feels like content the audience already enjoys, not an interruption.',
+      "UGC stands for User Generated Content — but in the creator world it means brand-sponsored content that feels organic and authentic. Unlike traditional ads, UGC is created by real creators who genuinely use and believe in the product. It lives on the creator's platform (TikTok, Instagram, YouTube) and feels like content the audience already enjoys, not an interruption.",
   },
   {
     question: "Are you an influencer?",
@@ -19,12 +19,17 @@ const faqs: FaqItem[] = [
       "Not really — I don't do lifestyle influencing or vanity metrics. I make conversion-focused UGC that directly drives sales for brands. My content is built to educate, demonstrate, and persuade — not to showcase my personal brand. The goal is always the same: make the viewer want to buy.",
   },
   {
-    question: 'What kind of content do you make?',
+    question: 'Where do you buy your hats?',
     answer:
-      'Mainly vertical short-form video for TikTok, Reels, and Shorts — the formats with the highest organic reach right now. I also produce YouTube Shorts, long-form YouTube content, and video ads. My sweet spot is tech, AI tools, SaaS, and travel products.',
+      "Ah, the infamous question. Unfortunately I can't share my secret supplier — some things are sacred. But if you're a brand looking to collaborate, that's the kind of creative detail we can bring to your next campaign. Reach out and let's talk.",
   },
   {
-    question: 'So do we post on your account or yours?',
+    question: 'What kind of content do you make?',
+    answer:
+      "Mainly vertical short-form video for TikTok, Reels, and Shorts — the formats with the highest organic reach right now. I also produce YouTube Shorts, long-form YouTube content, and video ads. My sweet spot is tech, AI tools, SaaS, and travel products.",
+  },
+  {
+    question: 'So do we post on our account or yours?',
     answer:
       "Typically UGC lives on my account, which gives it authenticity. The brand gets a licence to use the content on their own channels too. This gives you the best of both worlds — my audience trust and reach, plus content you own and can repurpose.",
   },
