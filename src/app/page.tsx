@@ -4,6 +4,8 @@ import VideoTicker from '@/components/sections/video-ticker'
 import SiteFooter from '@/components/sections/site-footer'
 import BentoGrid from '@/components/sections/bento-grid'
 import ReviewsTicker from '@/components/sections/reviews-ticker'
+import FaqSection from '@/components/sections/faq-section'
+import ContactSection from '@/components/sections/contact-section'
 import { homeContent } from '@/content/home-content'
 
 export default function HomePage() {
@@ -90,9 +92,8 @@ export default function HomePage() {
       <ContentTabs headline={contentTabs.headline} tabs={contentTabs.tabs} />
       <ReviewsTicker />
       <BentoGrid headline={homeContent.bentoGrid.headline} />
-
-      <section id="faq" className="spacer" />
-      <section id="getintouch" className="spacer" />
+      <FaqSection />
+      <ContactSection />
       <SiteFooter />
     </>
   )
