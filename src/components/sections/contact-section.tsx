@@ -1,10 +1,47 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+
+declare global {
+  interface Window {
+    Cal?: (cmd: string, ...args: unknown[]) => void
+  }
+}
 
 export default function ContactSection() {
   const [form, setForm] = useState({ name: '', email: '', project: '' })
   const [submitted, setSubmitted] = useState(false)
+
+  useEffect(() => {
+    // Load Cal.com inline embed — runs after DOM is ready
+    const existingScript = document.getElementById('cal-inline-script')
+    if (existingScript) return
+
+    const script = document.createElement('script')
+    script.id = 'cal-inline-script'
+    script.src = 'https://app.cal.com/embed/embed.js'
+    script.async = true
+    script.onload = () => {
+      if (window.Cal) {
+        window.Cal('init', '30min', { origin: 'https://app.cal.com' })
+        window.Cal('ns', '30min', 'inline', {
+          elementOrSelector: '#my-cal-inline-30min',
+          calLink: 'edcorner/30min',
+          config: {
+            layout: 'month_view',
+            useSlotsViewOnSmallScreen: true,
+          },
+        })
+        window.Cal('ns', '30min', 'ui', {
+          cssVarsPerTheme: {
+            light: { calBrand: '#CCFF00' },
+          },
+          layout: 'month_view',
+        })
+      }
+    }
+    document.head.appendChild(script)
+  }, [])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -71,9 +108,12 @@ export default function ContactSection() {
           )}
         </div>
 
-        {/* Cal.com inline embed — script loaded once in layout.tsx */}
+        {/* Cal.com inline embed */}
         <div className="contact-calendar-wrap">
-          <div id="my-cal-inline-30min" style={{ width: '100%', height: '100%', minHeight: '500px' }} />
+          <div
+            id="my-cal-inline-30min"
+            style={{ width: '100%', height: '100%', minHeight: '600px' }}
+          />
         </div>
       </div>
     </section>
