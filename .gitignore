@@ -1,4 +1,21 @@
--e node_modules
-.next
+# dependencies
+node_modules/
+
+# build output
+.next/
+out/
+
+# env files
 .env
-*.lock
+.env.local
+.env.*.local
+
+# lock files
+package-lock.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# large media (keep URLs in content config, not local files)
+public/media/videos/imported/
