@@ -17,7 +17,7 @@ export default function SiteHeader() {
 
           <nav className={`nav-links-bricolage ${open ? 'active' : ''}`} id="nav-drawer" aria-label="Main navigation">
             <Link href="#portfolio" onClick={() => setOpen(false)}>Recent Work</Link>
-            <Link href="#top" onClick={() => setOpen(false)}>About Me</Link>
+            <Link href="#about" onClick={() => setOpen(false)}>About Me</Link>
             <Link href="#getintouch" onClick={() => setOpen(false)}>Contact</Link>
           </nav>
 
