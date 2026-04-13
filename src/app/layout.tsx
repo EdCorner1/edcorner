@@ -20,31 +20,49 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className={bricolage.variable}>
         <SiteHeader />
         <main>{children}</main>
-        <footer
-          style={{
-            borderTop: '1px solid #e8e8e4',
-            marginTop: 40,
-            padding: '22px 18px',
-            background: '#fff',
+
+        {/* Cal.com booking embed */}
+        <script
+          type="text/javascript"
+          dangerouslySetInnerHTML={{
+            __html: `
+(function (C, A, L) {
+  let p = function (a, ar) { a.q.push(ar); };
+  let d = C.document;
+  C.Cal = C.Cal || function () {
+    let cal = C.Cal;
+    let ar = arguments;
+    if (!cal.loaded) {
+      cal.ns = {};
+      cal.q = cal.q || [];
+      d.head.appendChild(d.createElement("script")).src = A;
+      cal.loaded = true;
+    }
+    if (ar[0] === L) {
+      const api = function () { p(api, arguments); };
+      const namespace = ar[1];
+      api.q = api.q || [];
+      if (typeof namespace === "string") {
+        cal.ns[namespace] = cal.ns[namespace] || {};
+        p(cal.ns[namespace], ar);
+        p(cal, ["initNamespace", namespace]);
+      } else {
+        p(cal, ar);
+      }
+      return;
+    }
+    p(cal, ar);
+  };
+})(window, "https://app.cal.com/embed/embed.js", "init");
+Cal("init", "30min", { origin: "https://app.cal.com" });
+Cal.ns["30min"]("ui", {
+  "cssVarsPerTheme": { "light": { "cal-brand": "#CCFF00" } },
+  "hideEventTypeDetails": false,
+  "layout": "month_view"
+});
+            `,
           }}
-        >
-          <div
-            style={{
-              maxWidth: 1200,
-              margin: '0 auto',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: 12,
-              flexWrap: 'wrap',
-            }}
-          >
-            <strong style={{ color: '#333' }}>Ed Corner</strong>
-            <p style={{ color: '#8e8e8e', margin: 0, fontSize: 12 }}>
-              © 2026 Ed Corner. UGC & creator-led content for tech, AI and SaaS brands.
-            </p>
-          </div>
-        </footer>
+        />
       </body>
     </html>
   )

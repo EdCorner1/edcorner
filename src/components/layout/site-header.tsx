@@ -17,7 +17,7 @@ export default function SiteHeader() {
 
           <nav className={`nav-links-bricolage ${open ? 'active' : ''}`} id="nav-drawer" aria-label="Main navigation">
             <Link href="#portfolio" onClick={() => setOpen(false)}>Recent Work</Link>
-            <Link href="#about" onClick={() => setOpen(false)}>About Me</Link>
+            <Link href="#top" onClick={() => setOpen(false)}>About Me</Link>
             <Link href="#getintouch" onClick={() => setOpen(false)}>Contact</Link>
           </nav>
 
@@ -34,12 +34,23 @@ export default function SiteHeader() {
         </div>
 
         <div className="header-actions">
-          <Link href="#getintouch" className="book-call-btn" onClick={() => setOpen(false)}>
+          <button
+            className="book-call-btn"
+            data-cal-link="edcorner/30min"
+            data-cal-namespace="30min"
+            data-cal-config='{"layout":"month_view","useSlotsViewOnSmallScreen":"true"}'
+            style={{ border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 'inherit' }}
+          >
             Book a call
-          </Link>
-          <Link href="#getintouch" className="mail-btn" aria-label="Email Ed" onClick={() => setOpen(false)}>
+          </button>
+          <a
+            href="mailto:hello@edcorner.co.uk"
+            className="mail-btn"
+            aria-label="Email Ed"
+            style={{ fontSize: '20px', lineHeight: 1, padding: '0 14px' }}
+          >
             ✉
-          </Link>
+          </a>
         </div>
       </div>
     </header>
