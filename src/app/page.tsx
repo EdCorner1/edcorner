@@ -7,9 +7,61 @@ import ReviewsTicker from '@/components/sections/reviews-ticker'
 import FaqSection from '@/components/sections/faq-section'
 import ContactSection from '@/components/sections/contact-section'
 import { homeContent } from '@/content/home-content'
+import { getVideosByCategory, getTickerVideos, supabase } from '@/lib/supabase'
+import type { DbVideo } from '@/lib/supabase'
 
-export default function HomePage() {
-  const { hero, metrics, categories, videos, brands, videoTicker, creatorCards, contentTabs } = homeContent
+export const revalidate = 3600 // Rebuild every hour (ISR)
+
+// Static category order matching the site's original flow
+const CATEGORY_ORDER = ['Travel', 'Apps', 'Tech', 'Health & Fitness', 'AI']
+
+function seededShuffle<T>(items: T[], seed: string): T[] {
+  const arr = [...items]
+  let hash = 2166136261
+  for (let i = 0; i < seed.length; i++) {
+    hash ^= seed.charCodeAt(i)
+    hash = Math.imul(hash, 16777619)
+  }
+  let seedNum = hash >>> 0
+  for (let i = arr.length - 1; i > 0; i--) {
+    seedNum = (seedNum * 1664525 + 1013904223) >>> 0
+    const j = seedNum % (i + 1)
+    ;[arr[i], arr[j]] = [arr[j], arr[i]]
+  }
+  return arr
+}
+
+export default async function HomePage() {
+  // Fetch all videos from Supabase
+  const allVideos = await getVideosByCategory()
+
+  // Build ticker: featured videos + random selection, shuffled
+  const featuredUrls = Object.values(allVideos)
+    .flat()
+    .filter(v => v.featured)
+    .map(v => v.url)
+
+  const allUrls = Object.values(allVideos).flat().map(v => v.url)
+  const tickerVideos = seededShuffle(
+    [...new Set(allUrls)],
+    allUrls.join('|')
+  ).slice(0, 12)
+
+  const tickerUrls = tickerVideos as unknown as readonly string[]
+
+  // Build dynamic content tabs in category order
+  const dynamicTabs = CATEGORY_ORDER
+    .filter(cat => allVideos[cat]?.length > 0)
+    .map(category => ({
+      id: category.toLowerCase().replace(/ & /g, '-'),
+      label: category,
+      videos: allVideos[category]
+        .sort((a: DbVideo, b: DbVideo) => a.sort_order - b.sort_order)
+        .slice(0, 12)
+        .map(v => ({ url: v.url, uploadedAt: v.uploaded_at })),
+    }))
+
+  const { hero, metrics, categories, videos, brands, creatorCards } = homeContent
   const logos = brands.logos as ReadonlyArray<{ name: string; src: string }>
   const logoItems = [...logos, ...logos]
 
@@ -87,9 +139,16 @@ export default function HomePage() {
         </div>
       </section>
 
-      <VideoTicker videos={videoTicker.videos} />
+      <VideoTicker videos={tickerUrls} />
       <CreatorCards headline={creatorCards.headline} items={creatorCards.items} />
-      <ContentTabs headline={contentTabs.headline} tabs={contentTabs.tabs} />
+
+      {dynamicTabs.length > 0 && (
+        <ContentTabs
+          headline={homeContent.contentTabs.headline}
+          tabs={dynamicTabs as unknown as readonly { id: string; label: string; videos: readonly { url: string; uploadedAt: string }[] }[]}
+        />
+      )}
+
       <ReviewsTicker />
       <BentoGrid headline={homeContent.bentoGrid.headline} />
       <FaqSection />
