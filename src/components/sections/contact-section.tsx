@@ -75,15 +75,51 @@ export default function ContactSection() {
         {/* Cal.com Calendar Booking */}
         <div className="contact-calendar-wrap">
           <div
-            className="cal-com-embed"
-            data-cal-link="edcorner/30min"
-            data-cal-namespace="30min"
-            data-cal-config='{"layout":"month_view","useSlotsViewOnSmallScreen":"true"}'
-          >
-            <p style={{ textAlign: 'center', padding: '40px 20px', color: '#666' }}>
-              Calendar loading…
-            </p>
-          </div>
+            style={{ width: '100%', height: '100%', overflow: 'scroll' }}
+            id="my-cal-inline-30min"
+          />
+          <script
+            type="text/javascript"
+            dangerouslySetInnerHTML={{
+              __html: `
+(function (C, A, L) {
+  let p = function (a, ar) { a.q.push(ar); };
+  let d = C.document;
+  C.Cal = C.Cal || function () {
+    let cal = C.Cal;
+    let ar = arguments;
+    if (!cal.loaded) {
+      cal.ns = {};
+      cal.q = cal.q || [];
+      d.head.appendChild(d.createElement("script")).src = A;
+      cal.loaded = true;
+    }
+    if (ar[0] === L) {
+      const api = function () { p(api, arguments); };
+      const namespace = ar[1];
+      api.q = api.q || [];
+      if (typeof namespace === "string") {
+        cal.ns[namespace] = cal.ns[namespace] || {};
+        p(cal.ns[namespace], ar);
+        p(cal, ["initNamespace", namespace]);
+      } else {
+        p(cal, ar);
+      }
+      return;
+    }
+    p(cal, ar);
+  };
+})(window, "https://app.cal.com/embed/embed.js", "init");
+Cal("init", "30min", { origin: "https://app.cal.com" });
+Cal.ns["30min"]("inline", {
+  elementOrSelector: "#my-cal-inline-30min",
+  config: { "layout": "month_view", "useSlotsViewOnSmallScreen": "true" },
+  calLink: "edcorner/30min",
+});
+Cal.ns["30min"]("ui", { "hideEventTypeDetails": false, "layout": "month_view" });
+              `.trim(),
+            }}
+          />
         </div>
       </div>
     </section>
