@@ -3,6 +3,7 @@ import CreatorCards from '@/components/sections/creator-cards'
 import VideoTicker from '@/components/sections/video-ticker'
 import SiteFooter from '@/components/sections/site-footer'
 import BentoGrid from '@/components/sections/bento-grid'
+import ReviewsTicker from '@/components/sections/reviews-ticker'
 import { homeContent } from '@/content/home-content'
 
 export default function HomePage() {
@@ -86,8 +87,8 @@ export default function HomePage() {
 
       <VideoTicker videos={videoTicker.videos} />
       <CreatorCards headline={creatorCards.headline} items={creatorCards.items} />
+      <ReviewsTicker />
       <ContentTabs headline={contentTabs.headline} tabs={contentTabs.tabs} />
-      <VideoTicker videos={videoTicker.videos} />
       <BentoGrid headline={homeContent.bentoGrid.headline} />
 
       <section id="faq" className="spacer" />

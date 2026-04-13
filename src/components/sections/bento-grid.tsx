@@ -12,34 +12,38 @@ const projects: Project[] = [
   {
     icon: '▶️',
     label: 'YouTube',
-    title: 'Ed Corner YouTube',
-    description: 'Vertical shorts, long-form breakdowns, and behind-the-scenes from my UGC workflow. Subscribe and watch the creative process unfold.',
-    cta: 'Watch now',
-    href: 'https://www.youtube.com/@edcorner',
+    title: 'Letting Openclaw Control My Life for 30 Days',
+    description:
+      "I'm handing my daily operations to an AI for 30 days — building, shipping, and automating everything with OpenClaw. Follow the experiment on YouTube.",
+    cta: 'Watch on YouTube',
+    href: 'https://youtube.com/@thisisedcorner',
   },
   {
     icon: '📧',
     label: 'Newsletter',
-    title: 'The Ed Corner Dispatch',
-    description: "Weekly drops on what's working in tech UGC — brand deals, creator tactics, AI tools, and opportunities you can actually act on.",
+    title: 'The Tech Creators Newsletter',
+    description:
+      "Weekly drops on what's working in tech UGC — brand deals, creator tactics, AI tools, and opportunities you can actually act on.",
     cta: 'Subscribe free',
-    href: '#getintouch',
+    href: 'https://newsletter.edcorner.co.uk',
   },
   {
     icon: '🎙️',
     label: 'Podcast',
-    title: 'Creator Lab Podcast',
-    description: 'Conversations with top UGC creators and tech founders. Learn how they built their audiences, landed deals, and think about content.',
-    cta: 'Listen on Spotify',
-    href: '#getintouch',
+    title: 'The Tech Creators Club',
+    description:
+      'Conversations with top UGC creators and tech founders. Learn how they built their audiences, landed deals, and think about content.',
+    cta: 'Listen now',
+    href: 'https://newsletter.edcorner.co.uk',
   },
   {
     icon: '⚡',
     label: 'Coming Soon',
     title: 'Otto UGC',
-    description: 'A UGC marketplace built specifically for tech and AI creators. Connect with brands, manage deals, and grow your creator business — all in one place.',
+    description:
+      'A UGC marketplace built specifically for tech and AI creators. Connect with brands, manage deals, and grow your creator business — all in one place.',
     cta: 'Join waitlist',
-    href: '#getintouch',
+    href: 'https://otto.edcorner.co.uk',
     badge: 'Coming soon',
   },
 ]
