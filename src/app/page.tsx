@@ -60,7 +60,7 @@ export default function HomePage() {
               </div>
 
               <div className="vid-card v2">
-                <video loop muted playsInline autoPlay>
+                <video loop muted playsInline preload="none">
                   <source src={videos.secondary} type="video/mp4" />
                 </video>
               </div>

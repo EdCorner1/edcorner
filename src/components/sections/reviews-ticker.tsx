@@ -35,7 +35,7 @@ const reviews: Review[] = [
 ]
 
 export default function ReviewsTicker() {
-  const loopItems = [...reviews, ...reviews, ...reviews]
+  const loopItems = [...reviews, ...reviews]
 
   return (
     <section className="reviews-ticker-wrap" aria-label="Client reviews">
