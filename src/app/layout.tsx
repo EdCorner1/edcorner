@@ -10,8 +10,8 @@ const bricolage = Bricolage_Grotesque({
 })
 
 export const metadata: Metadata = {
-  title: 'Ed Corner — UGC for tech, AI & travel brands',
-  description: 'UGC and creator-led content for tech, AI and SaaS brands that want stronger creative.',
+  title: 'Ed Corner — UGC & Tech Creator',
+  description: 'UGC and creator-led content for tech, AI and SaaS brands.',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -20,10 +20,29 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className={bricolage.variable}>
         <SiteHeader />
         <main>{children}</main>
-        <footer className="py-6 px-8 border-t border-[#e8e8e4] mt-20">
-          <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-            <span className="text-sm font-bold text-[#333]">Ed Corner</span>
-            <p className="text-xs text-[#9a9a9a]">© 2025 Ed Corner. UGC & creator-led content for tech, AI and SaaS brands.</p>
+        <footer
+          style={{
+            borderTop: '1px solid #e8e8e4',
+            marginTop: 40,
+            padding: '22px 18px',
+            background: '#fff',
+          }}
+        >
+          <div
+            style={{
+              maxWidth: 1200,
+              margin: '0 auto',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: 12,
+              flexWrap: 'wrap',
+            }}
+          >
+            <strong style={{ color: '#333' }}>Ed Corner</strong>
+            <p style={{ color: '#8e8e8e', margin: 0, fontSize: 12 }}>
+              © 2026 Ed Corner. UGC & creator-led content for tech, AI and SaaS brands.
+            </p>
           </div>
         </footer>
       </body>
