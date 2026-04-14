@@ -1,73 +1,34 @@
 'use client'
 
-import { useEffect } from 'react'
-
-declare global {
-  interface Window {
-    Cal?: (cmd: string, ...args: unknown[]) => void
-    calButtonInitialized?: boolean
-  }
-}
+import Link from 'next/link'
+import { useState } from 'react'
+import { mediaAssets } from '@/content/media'
 
 export default function SiteHeader() {
-  useEffect(() => {
-    const initCalButton = () => {
-      if (window.calButtonInitialized) return
-      window.calButtonInitialized = true
-
-      const btn = document.querySelector('.book-call-btn') as HTMLButtonElement | null
-      if (!btn) return
-
-      btn.addEventListener('click', (e) => {
-        e.preventDefault()
-        if (window.Cal) {
-          window.Cal('show', {
-            calLink: 'edcorner/30min',
-            layout: 'month_view',
-          })
-        } else {
-          window.open('https://app.cal.com/edcorner/30min', '_blank')
-        }
-      })
-    }
-
-    // Wait for embed.js to be ready
-    const checkAndInit = () => {
-      if ((window as Window).Cal) {
-        initCalButton()
-      } else {
-        setTimeout(checkAndInit, 100)
-      }
-    }
-
-    // If embed.js already loaded
-    if (document.getElementById('cal-embed-script')) {
-      checkAndInit()
-    } else {
-      const s = document.createElement('script')
-      s.id = 'cal-embed-script'
-      s.src = 'https://app.cal.com/embed/embed.js'
-      s.async = true
-      s.onload = checkAndInit
-      document.body.appendChild(s)
-    }
-  }, [])
+  const [open, setOpen] = useState(false)
 
   return (
     <header className="header-system-wrapper">
       <div className="header-shell">
         <div className="header-left-pill">
-          <a href="#top" className="header-avatar-link" aria-label="Back to top">
-            <img src="https://edcorner.co.uk/wp-content/uploads/2026/03/cropped-Untitled-design-6.png" alt="Ed" className="header-avatar" />
-          </a>
+          <Link href="#top" className="header-avatar-link" onClick={() => setOpen(false)} aria-label="Back to top">
+            <img src={mediaAssets.avatar} alt="Ed" className="header-avatar" />
+          </Link>
 
-          <nav className="nav-links-bricolage" id="nav-drawer" aria-label="Main navigation">
-            <a href="#portfolio">Recent Work</a>
-            <a href="#about">About Me</a>
-            <a href="#getintouch">Contact</a>
+          <nav className={`nav-links-bricolage ${open ? 'active' : ''}`} id="nav-drawer" aria-label="Main navigation">
+            <Link href="#portfolio" onClick={() => setOpen(false)}>Recent Work</Link>
+            <Link href="#about" onClick={() => setOpen(false)}>About Me</Link>
+            <Link href="#getintouch" onClick={() => setOpen(false)}>Contact</Link>
           </nav>
 
-          <button className="mobile-btn" aria-label="Toggle menu">
+          <button
+            className="mobile-btn"
+            aria-label="Toggle menu"
+            aria-expanded={open}
+            aria-controls="nav-drawer"
+            onClick={() => setOpen((v) => !v)}
+            type="button"
+          >
             <span />
             <span />
             <span />
@@ -75,7 +36,14 @@ export default function SiteHeader() {
         </div>
 
         <div className="header-actions">
-          <button className="book-call-btn" type="button">
+          <button
+            className="book-call-btn"
+            data-cal-link="edcorner/30min"
+            data-cal-namespace="30min"
+            data-cal-config='{"layout":"month_view","useSlotsViewOnSmallScreen":true}'
+            style={{ border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 'inherit' }}
+            type="button"
+          >
             Book a call
           </button>
           <a
