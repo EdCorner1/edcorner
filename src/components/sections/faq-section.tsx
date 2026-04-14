@@ -2,46 +2,34 @@
 
 import { useState } from 'react'
 
-type FaqItem = {
-  question: string
-  answer: string
-}
-
-const faqs: FaqItem[] = [
+const faqs = [
   {
-    question: 'What is UGC?',
-    answer:
-      "UGC stands for User Generated Content — but in the creator world it means brand-sponsored content that feels organic and authentic. Unlike traditional ads, UGC is created by real creators who genuinely use and believe in the product. It lives on the creator's platform (TikTok, Instagram, YouTube) and feels like content the audience already enjoys, not an interruption.",
+    q: 'So what actually is UGC?',
+    a: "UGC stands for User Generated Content. It's video content created by real people — not actors, not polished ads — that feels like something a friend would send you. Brands love it because it cuts through the ad noise. I love it because it pays.",
   },
   {
-    question: "Are you an influencer?",
-    answer:
-      "Not really — I don't do lifestyle influencing or vanity metrics. I make conversion-focused UGC that directly drives sales for brands. My content is built to educate, demonstrate, and persuade — not to showcase my personal brand. The goal is always the same: make the viewer want to buy.",
+    q: 'Are you like an influencer?',
+    a: "Sort of, but different. Influencers build audiences and post brand content to their own followers. I create content for brands — they use it in their ads, on their website, across their channels. My face, their product, their campaign.",
   },
   {
-    question: 'Where do you buy your hats?',
-    answer:
-      "Ah, the infamous question. Unfortunately I can't share my secret supplier — some things are sacred. But if you're a brand looking to collaborate, that's the kind of creative detail we can bring to your next campaign. Reach out and let's talk.",
+    q: "Where do you buy all your hats from?",
+    a: "Everywhere. Zara, Cos, Asos, Amazon, markets. I've been asked about three specific hats this month so I'm starting to think I have a problem.",
   },
   {
-    question: 'What kind of content do you make?',
-    answer:
-      "Mainly vertical short-form video for TikTok, Reels, and Shorts — the formats with the highest organic reach right now. I also produce YouTube Shorts, long-form YouTube content, and video ads. My sweet spot is tech, AI tools, SaaS, and travel products.",
+    q: "What kind of content do you make?",
+    a: "Short form mostly — TikToks, YouTube Shorts, Instagram Reels. But I've done longer tutorials, product demo reels, LinkedIn content, and testimonial-style pieces. If it fits in a vertical frame and holds attention, I'm in.",
   },
   {
-    question: 'So do we post on our account or yours?',
-    answer:
-      "Typically UGC lives on my account, which gives it authenticity. The brand gets a licence to use the content on their own channels too. This gives you the best of both worlds — my audience trust and reach, plus content you own and can repurpose.",
+    q: "So do we post on my account or yours?",
+    a: "Depends on the brief. Usually the brand gets the rights to use the content in their own ads — that means paid social, website, email. Sometimes we post to my profile as well, which gives it extra reach. We'll agree on the usage in the proposal.",
   },
   {
-    question: 'How do you measure success?',
-    answer:
-      "Views, saves, shares, click-throughs, and ultimately conversions. I track performance closely and share weekly reports with every client. If content isn't performing, we iterate fast — the first 30 days are about finding what resonates and then scaling it.",
+    q: "How do you measure success?",
+    a: "Views, engagement, click-throughs, conversions — whatever the campaign goal is. I track everything and report back at the end. If the content isn't performing, I'll tell you why and what we'd change next time.",
   },
   {
-    question: 'How quickly can you turn content around?',
-    answer:
-      "For most campaigns I deliver within 48–72 hours of brief sign-off. For urgent launches I can move faster. The process is simple: brief → strategy call → content creation → delivery with full licence for brand use.",
+    q: "How quickly can you turn content around?",
+    a: "My standard turnaround is 3–5 days from brief to finished files. Rush turnarounds can usually be accommodated — just ask upfront and I'll let you know what's possible.",
   },
 ]
 
@@ -50,31 +38,37 @@ export default function FaqSection() {
 
   return (
     <section className="faq-section" id="faq">
-      <h2 className="faq-headline">Before you ask</h2>
+      <div className="faq-inner">
+        <div className="faq-header">
+          <p className="faq-eyebrow">FAQ</p>
+          <h2 className="faq-headline">Before you ask</h2>
+        </div>
 
-      <div className="faq-list">
-        {faqs.map((faq, index) => (
-          <div
-            key={index}
-            className={`faq-item ${openIndex === index ? 'faq-item--open' : ''}`}
-          >
-            <button
-              className="faq-question"
-              onClick={() => setOpenIndex(openIndex === index ? null : index)}
-              aria-expanded={openIndex === index}
+        <div className="faq-list">
+          {faqs.map((faq, i) => (
+            <div
+              key={i}
+              className={`faq-item ${openIndex === i ? 'faq-item--open' : ''}`}
             >
-              <span>{faq.question}</span>
-              <span className="faq-icon" aria-hidden="true">
-                {openIndex === index ? '−' : '+'}
-              </span>
-            </button>
-            {openIndex === index && (
-              <div className="faq-answer">
-                <p>{faq.answer}</p>
-              </div>
-            )}
-          </div>
-        ))}
+              <button
+                type="button"
+                className="faq-question"
+                onClick={() => setOpenIndex(openIndex === i ? null : i)}
+                aria-expanded={openIndex === i}
+              >
+                <span>{faq.q}</span>
+                <span className="faq-icon" aria-hidden="true">
+                  {openIndex === i ? '−' : '+'}
+                </span>
+              </button>
+              {openIndex === i && (
+                <div className="faq-answer">
+                  <p>{faq.a}</p>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   )
