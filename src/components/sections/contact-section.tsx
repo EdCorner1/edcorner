@@ -1,51 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-
-declare global {
-  interface Window {
-    Cal?: (cmd: string, ...args: unknown[]) => void
-    calInlineInitialized?: boolean
-  }
-}
+import { useState } from 'react'
 
 export default function ContactSection() {
   const [form, setForm] = useState({ name: '', email: '', project: '' })
   const [submitted, setSubmitted] = useState(false)
-  const [calLoaded, setCalLoaded] = useState(false)
-
-  useEffect(() => {
-    const initInline = () => {
-      if (window.calInlineInitialized) return
-      window.calInlineInitialized = true
-
-      if (window.Cal) {
-        try {
-          window.Cal('init', '30min', { origin: 'https://app.cal.com' })
-          window.Cal('ns', '30min', 'inline', {
-            elementOrSelector: '#my-cal-inline-30min',
-            config: { layout: 'month_view', useSlotsViewOnSmallScreen: true },
-            calLink: 'edcorner/30min',
-          })
-        } catch {
-          // silently skip if Cal isn't ready
-        }
-      }
-      setCalLoaded(true)
-    }
-
-    if (document.getElementById('cal-embed-script')) {
-      // Script already loaded by header — init immediately
-      initInline()
-    } else {
-      const s = document.createElement('script')
-      s.id = 'cal-embed-script'
-      s.src = 'https://app.cal.com/embed/embed.js'
-      s.async = true
-      s.onload = initInline
-      document.body.appendChild(s)
-    }
-  }, [])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -88,9 +47,19 @@ export default function ContactSection() {
           )}
         </div>
 
-        {/* Cal.com inline booking */}
+        {/* Cal.com inline booking — uses Cal.com's direct embed pattern */}
         <div className="contact-calendar-wrap">
-          <div id="my-cal-inline-30min" style={{ width: '100%', height: '100%', minHeight: '680px' }} />
+          <div style={{ width: '100%', height: '100%', overflow: 'auto' }}>
+            <iframe
+              src="https://app.cal.com/schedules/edcorner/30min?embedType=Inline&amp;hideEventTypeDetails=false&amp;layout=month_view"
+              width="100%"
+              height="700"
+              frameBorder="0"
+              title="Book a call with Ed"
+              loading="lazy"
+              style={{ borderRadius: '0', background: 'transparent' }}
+            />
+          </div>
         </div>
       </div>
     </section>

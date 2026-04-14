@@ -82,7 +82,7 @@ export default function SiteHeader() {
             href="mailto:hello@edcorner.co.uk"
             className="mail-btn"
             aria-label="Email Ed"
-            style={{ fontSize: '20px', lineHeight: 1, padding: '0 14px' }}
+            style={{ fontSize: '24px', lineHeight: 1, padding: '0 14px' }}
           >
             ✉
           </a>
