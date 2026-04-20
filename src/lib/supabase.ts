@@ -5,6 +5,18 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
+export const VIDEO_BASE_COLUMNS = [
+  'id',
+  'url',
+  'category',
+  'title',
+  'caption',
+  'uploaded_at',
+  'featured',
+  'sort_order',
+  'storage_path',
+] as const
+
 export type DbVideo = {
   id: string
   url: string
@@ -14,18 +26,22 @@ export type DbVideo = {
   uploaded_at: string
   featured: boolean
   sort_order: number
+  storage_path?: string | null
 }
 
 export async function getVideosByCategory(): Promise<Record<string, DbVideo[]>> {
   const { data, error } = await supabase
     .from('videos')
-    .select('*')
+    .select(VIDEO_BASE_COLUMNS.join(','))
     .order('sort_order', { ascending: true })
+    .order('uploaded_at', { ascending: false })
 
   if (error || !data) return {}
 
+  const videos = data as unknown as DbVideo[]
+
   const result: Record<string, DbVideo[]> = {}
-  for (const video of data as DbVideo[]) {
+  for (const video of videos) {
     if (!result[video.category]) result[video.category] = []
     result[video.category].push(video)
   }
@@ -35,20 +51,10 @@ export async function getVideosByCategory(): Promise<Record<string, DbVideo[]>> 
 export async function getAllVideos(): Promise<DbVideo[]> {
   const { data, error } = await supabase
     .from('videos')
-    .select('*')
+    .select(VIDEO_BASE_COLUMNS.join(','))
     .order('sort_order', { ascending: true })
+    .order('uploaded_at', { ascending: false })
 
   if (error || !data) return []
-  return data as DbVideo[]
-}
-
-export async function getTickerVideos(count = 9): Promise<string[]> {
-  const { data, error } = await supabase
-    .from('videos')
-    .select('url')
-    .order('featured', { ascending: false })
-    .limit(count)
-
-  if (error || !data) return []
-  return (data as { url: string }[]).map(v => v.url)
+  return data as unknown as DbVideo[]
 }

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Script from 'next/script'
 import { Bricolage_Grotesque } from 'next/font/google'
-import SiteHeader from '@/components/layout/site-header'
+import AppShell from '@/components/layout/app-shell'
 import './globals.css'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import { Analytics } from '@vercel/analytics/react'
@@ -47,8 +47,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className={bricolage.variable}>
-        <SiteHeader />
-        <main>{children}</main>
+        <AppShell>{children}</AppShell>
         <SpeedInsights />
         <Analytics />
 

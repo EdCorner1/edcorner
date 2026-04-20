@@ -7,7 +7,7 @@ import ReviewsTicker from '@/components/sections/reviews-ticker'
 import FaqSection from '@/components/sections/faq-section'
 import ContactSection from '@/components/sections/contact-section'
 import { homeContent } from '@/content/home-content'
-import { getVideosByCategory, getTickerVideos, supabase } from '@/lib/supabase'
+import { getVideosByCategory } from '@/lib/supabase'
 import type { DbVideo } from '@/lib/supabase'
 
 export const revalidate = 3600 // Rebuild every hour (ISR)
@@ -34,12 +34,6 @@ function seededShuffle<T>(items: T[], seed: string): T[] {
 export default async function HomePage() {
   // Fetch all videos from Supabase
   const allVideos = await getVideosByCategory()
-
-  // Build ticker: featured videos + random selection, shuffled
-  const featuredUrls = Object.values(allVideos)
-    .flat()
-    .filter(v => v.featured)
-    .map(v => v.url)
 
   const allUrls = Object.values(allVideos).flat().map(v => v.url)
   const tickerVideos = seededShuffle(
