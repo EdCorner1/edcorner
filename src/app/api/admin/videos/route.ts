@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { requireAdminAuth } from '@/lib/admin-auth'
+import { hasAdminSession } from '@/lib/admin-auth'
 import { getAdminSupabase } from '@/lib/admin-supabase'
 import { VIDEO_BASE_COLUMNS } from '@/lib/supabase'
 
@@ -50,7 +50,9 @@ function validatePayload(payload: ReturnType<typeof normalizePayload>) {
 }
 
 export async function POST(request: Request) {
-  await requireAdminAuth()
+  if (!(await hasAdminSession())) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
 
   try {
     const body = (await request.json()) as VideoPayload
@@ -78,7 +80,9 @@ export async function POST(request: Request) {
 }
 
 export async function PATCH(request: Request) {
-  await requireAdminAuth()
+  if (!(await hasAdminSession())) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
 
   try {
     const body = (await request.json()) as VideoPayload
@@ -111,7 +115,9 @@ export async function PATCH(request: Request) {
 }
 
 export async function DELETE(request: Request) {
-  await requireAdminAuth()
+  if (!(await hasAdminSession())) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
 
   try {
     const { searchParams } = new URL(request.url)

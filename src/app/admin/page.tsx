@@ -1,11 +1,11 @@
 import VideoCms from '@/components/admin/video-cms'
-import { requireAdminAuth } from '@/lib/admin-auth'
+import { requireAdminPageAuth } from '@/lib/admin-auth'
 import { getAllVideos } from '@/lib/supabase'
 
 export const dynamic = 'force-dynamic'
 
 export default async function AdminPage() {
-  await requireAdminAuth()
+  await requireAdminPageAuth()
 
   const videos = await getAllVideos()
 
