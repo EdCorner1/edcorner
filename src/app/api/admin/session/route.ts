@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server'
-import { clearAdminSession, createAdminSession } from '@/lib/admin-auth'
+
+const ADMIN_COOKIE = 'edcorner-admin-auth'
+const ADMIN_COOKIE_VALUE = 'ok'
 
 export async function POST(request: Request) {
   const body = await request.json().catch(() => null)
@@ -9,12 +11,25 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Missing email.' }, { status: 400 })
   }
 
-  await createAdminSession()
-
-  return NextResponse.json({ ok: true })
+  const response = NextResponse.json({ ok: true })
+  response.cookies.set(ADMIN_COOKIE, ADMIN_COOKIE_VALUE, {
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production',
+    path: '/',
+    maxAge: 60 * 60 * 24 * 7,
+  })
+  return response
 }
 
 export async function DELETE() {
-  await clearAdminSession()
-  return NextResponse.json({ ok: true })
+  const response = NextResponse.json({ ok: true })
+  response.cookies.set(ADMIN_COOKIE, '', {
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production',
+    path: '/',
+    expires: new Date(0),
+  })
+  return response
 }
