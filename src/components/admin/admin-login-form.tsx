@@ -1,58 +1,13 @@
-'use client'
-
-import { useState, useTransition } from 'react'
-import { useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
-
 type AdminLoginFormProps = {
   redirectTo?: string
+  error?: string | null
 }
 
-export default function AdminLoginForm({ redirectTo = '/admin' }: AdminLoginFormProps) {
-  const router = useRouter()
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState<string | null>(null)
-  const [isPending, startTransition] = useTransition()
-
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-    setError(null)
-
-    const { data, error: signInError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
-
-    if (signInError || !data.user) {
-      setError(signInError?.message ?? 'Could not sign you in.')
-      return
-    }
-
-    const response = await fetch('/api/admin/session', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        email: data.user.email,
-      }),
-    })
-
-    if (!response.ok) {
-      const payload = await response.json().catch(() => null)
-      setError(payload?.error ?? 'Signed in, but could not open admin session.')
-      return
-    }
-
-    startTransition(() => {
-      router.replace(redirectTo)
-      router.refresh()
-    })
-  }
-
+export default function AdminLoginForm({ redirectTo = '/admin', error }: AdminLoginFormProps) {
   return (
-    <form className="admin-auth-card admin-auth-form" onSubmit={handleSubmit}>
+    <form className="admin-auth-card admin-auth-form" method="post" action="/api/admin/session">
+      <input type="hidden" name="redirectTo" value={redirectTo} />
+
       <div className="admin-auth-copy">
         <span className="admin-eyebrow">Private admin</span>
         <h1>Sign in to manage videos</h1>
@@ -68,8 +23,7 @@ export default function AdminLoginForm({ redirectTo = '/admin' }: AdminLoginForm
           inputMode="email"
           placeholder="you@edcorner.co.uk"
           type="email"
-          value={email}
-          onChange={(event) => setEmail(event.target.value)}
+          name="email"
           required
         />
       </label>
@@ -80,16 +34,15 @@ export default function AdminLoginForm({ redirectTo = '/admin' }: AdminLoginForm
           autoComplete="current-password"
           placeholder="••••••••"
           type="password"
-          value={password}
-          onChange={(event) => setPassword(event.target.value)}
+          name="password"
           required
         />
       </label>
 
       {error ? <p className="admin-form-error">{error}</p> : null}
 
-      <button className="admin-primary-btn" type="submit" disabled={isPending}>
-        {isPending ? 'Opening dashboard…' : 'Open admin'}
+      <button className="admin-primary-btn" type="submit">
+        Open admin
       </button>
     </form>
   )
