@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 
-export const STORAGE_BUCKET = 'edcorner-media'
+export const STORAGE_BUCKET = 'edcorner-media-v2'
 
 export function getAdminSupabase() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL

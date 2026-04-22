@@ -7,12 +7,13 @@ const ALLOWED_TYPES = [
   'image/jpeg',
   'image/webp',
   'image/gif',
+  'image/svg+xml',
   'video/mp4',
   'video/quicktime',
   'video/webm',
 ]
 
-const MAX_SIZE = 50 * 1024 * 1024 // 50MB
+const MAX_SIZE = 250 * 1024 * 1024 // 250MB
 
 export async function POST(request: Request) {
   if (!(await hasAdminSession())) {
@@ -33,7 +34,7 @@ export async function POST(request: Request) {
     }
 
     if (file.size > MAX_SIZE) {
-      return NextResponse.json({ error: 'File too large. Max 50MB.' }, { status: 400 })
+      return NextResponse.json({ error: 'File too large. Max 250MB.' }, { status: 400 })
     }
 
     // Sanitize filename: replace spaces, keep extension

@@ -12,7 +12,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
-export const STORAGE_BUCKET = 'edcorner-media'
+export const STORAGE_BUCKET = 'edcorner-media-v2'
 
 export const VIDEO_BASE_COLUMNS = [
   'id',

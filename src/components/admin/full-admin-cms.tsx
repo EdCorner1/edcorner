@@ -626,7 +626,7 @@ export default function FullAdminCms({
                 <input
                   ref={avatarInputRef}
                   type="file"
-                  accept="image/png,image/jpeg,image/webp,image/gif"
+                  accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml"
                   className="admin-hidden-file-input"
                   onChange={handleAvatarUpload}
                 />
@@ -824,7 +824,7 @@ export default function FullAdminCms({
                       {uploading && uploadingTarget === `logo-${index}` ? 'Uploading…' : 'Upload'}
                       <input
                         type="file"
-                        accept="image/png,image/jpeg,image/webp,image/gif"
+                        accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml"
                         className="admin-hidden-file-input"
                         onChange={(e) => handleBrandLogoUpload(e, index)}
                       />
@@ -873,7 +873,7 @@ export default function FullAdminCms({
             <label className="admin-upload-zone">
               <input
                 type="file"
-                accept="image/png,image/jpeg,image/webp,image/gif,video/mp4,video/quicktime,video/webm"
+                accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml,video/mp4,video/quicktime,video/webm"
                 onChange={handleFileUpload}
                 disabled={uploading}
                 className="admin-upload-input"
