@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState, useTransition } from 'react'
+import { useMemo, useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import type { DbVideo } from '@/lib/supabase'
 
@@ -95,6 +95,12 @@ export default function FullAdminCms({
   // Upload state
   const [uploadFolder, setUploadFolder] = useState('videos')
   const [uploading, setUploading] = useState(false)
+  const [uploadingTarget, setUploadingTarget] = useState<string | null>(null)
+
+  const avatarInputRef = useRef<HTMLInputElement | null>(null)
+  const heroPrimaryInputRef = useRef<HTMLInputElement | null>(null)
+  const heroSecondaryInputRef = useRef<HTMLInputElement | null>(null)
+  const videoInputRef = useRef<HTMLInputElement | null>(null)
 
   const featuredCount = useMemo(() => videos.filter((v) => v.featured).length, [videos])
   const categoryCount = useMemo(() => new Set(videos.map((v) => v.category)).size, [videos])
@@ -231,16 +237,14 @@ export default function FullAdminCms({
 
   /* ========== File Upload ========== */
 
-  async function handleFileUpload(event: React.ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0]
-    if (!file) return
-
+  async function uploadFile(file: File, folder: string, target?: string) {
     setUploading(true)
+    setUploadingTarget(target ?? folder)
     clearFeedback()
 
     const formData = new FormData()
     formData.append('file', file)
-    formData.append('folder', uploadFolder)
+    formData.append('folder', folder)
 
     try {
       const response = await fetch('/api/admin/upload', {
@@ -251,34 +255,103 @@ export default function FullAdminCms({
       const payload = await response.json()
       if (!response.ok) {
         setError(payload.error ?? 'Upload failed.')
-        setUploading(false)
-        return
+        return null
       }
 
-      setStatus(`Uploaded to ${payload.path} — URL: ${payload.url}`)
-      setUploading(false)
-
-      // Auto-fill relevant form fields based on folder
-      if (uploadFolder === 'avatar') {
-        setProfileForm((prev) => ({ ...prev, avatarUrl: payload.url }))
-      } else if (uploadFolder === 'hero-videos') {
-        if (!heroVideoForm.primaryUrl) {
-          setHeroVideoForm((prev) => ({ ...prev, primaryUrl: payload.url }))
-        } else if (!heroVideoForm.secondaryUrl) {
-          setHeroVideoForm((prev) => ({ ...prev, secondaryUrl: payload.url }))
-        }
-      } else if (uploadFolder === 'videos') {
-        setVideoForm((prev) => ({ ...prev, url: payload.url, storage_path: payload.path }))
-      } else if (uploadFolder === 'logos') {
-        setBrandsForm((prev) => [...prev, { name: file.name.replace(/\.[^.]+$/, ''), src: payload.url }])
-      }
+      setStatus(`Uploaded successfully.`)
+      return payload as { path: string; url: string }
     } catch {
       setError('Upload failed.')
+      return null
+    } finally {
       setUploading(false)
+      setUploadingTarget(null)
+    }
+  }
+
+  async function handleFileUpload(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    const payload = await uploadFile(file, uploadFolder, `tab-${uploadFolder}`)
+    if (!payload) {
+      event.target.value = ''
+      return
     }
 
-    // Reset the file input
+    if (uploadFolder === 'avatar') {
+      setProfileForm((prev) => ({ ...prev, avatarUrl: payload.url }))
+    } else if (uploadFolder === 'hero-videos') {
+      if (!heroVideoForm.primaryUrl) {
+        setHeroVideoForm((prev) => ({ ...prev, primaryUrl: payload.url }))
+      } else if (!heroVideoForm.secondaryUrl) {
+        setHeroVideoForm((prev) => ({ ...prev, secondaryUrl: payload.url }))
+      }
+    } else if (uploadFolder === 'videos') {
+      setVideoForm((prev) => ({ ...prev, url: payload.url, storage_path: payload.path }))
+    } else if (uploadFolder === 'logos') {
+      setBrandsForm((prev) => [...prev, { name: file.name.replace(/\.[^.]+$/, ''), src: payload.url }])
+    }
+
     event.target.value = ''
+  }
+
+  async function handleAvatarUpload(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0]
+    if (!file) return
+    const payload = await uploadFile(file, 'avatar', 'avatar')
+    if (payload) {
+      setProfileForm((prev) => ({ ...prev, avatarUrl: payload.url }))
+    }
+    event.target.value = ''
+  }
+
+  async function handleHeroVideoUpload(event: React.ChangeEvent<HTMLInputElement>, slot: 'primary' | 'secondary') {
+    const file = event.target.files?.[0]
+    if (!file) return
+    const payload = await uploadFile(file, 'hero-videos', `hero-${slot}`)
+    if (payload) {
+      setHeroVideoForm((prev) => ({
+        ...prev,
+        [slot === 'primary' ? 'primaryUrl' : 'secondaryUrl']: payload.url,
+      }))
+    }
+    event.target.value = ''
+  }
+
+  async function handleVideoEntryUpload(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0]
+    if (!file) return
+    const payload = await uploadFile(file, 'videos', 'video-entry')
+    if (payload) {
+      setVideoForm((prev) => ({ ...prev, url: payload.url, storage_path: payload.path }))
+      if (!videoForm.title) {
+        setVideoForm((prev) => ({ ...prev, title: file.name.replace(/\.[^.]+$/, '') }))
+      }
+    }
+    event.target.value = ''
+  }
+
+  async function handleBrandLogoUpload(event: React.ChangeEvent<HTMLInputElement>, index: number) {
+    const file = event.target.files?.[0]
+    if (!file) return
+    const payload = await uploadFile(file, 'logos', `logo-${index}`)
+    if (payload) {
+      setBrandsForm((prev) => {
+        const next = [...prev]
+        const current = next[index] ?? { name: '', src: '' }
+        next[index] = {
+          name: current.name || file.name.replace(/\.[^.]+$/, ''),
+          src: payload.url,
+        }
+        return next
+      })
+    }
+    event.target.value = ''
+  }
+
+  function triggerFileInput(ref: React.RefObject<HTMLInputElement | null>) {
+    ref.current?.click()
   }
 
   /* ========== Auth ========== */
@@ -360,13 +433,30 @@ export default function FullAdminCms({
             <div className="admin-form-grid">
               <label className="admin-field admin-field-full">
                 <span>Video URL</span>
-                <input
-                  placeholder="https://.../video.mp4 — or use Upload tab"
-                  type="url"
-                  value={videoForm.url}
-                  onChange={(e) => setVideoForm((c) => ({ ...c, url: e.target.value }))}
-                  required
-                />
+                <div className="admin-inline-upload-row">
+                  <input
+                    placeholder="https://.../video.mp4 — or upload directly"
+                    type="url"
+                    value={videoForm.url}
+                    onChange={(e) => setVideoForm((c) => ({ ...c, url: e.target.value }))}
+                    required
+                  />
+                  <button
+                    className="admin-secondary-btn"
+                    type="button"
+                    onClick={() => triggerFileInput(videoInputRef)}
+                    disabled={uploading}
+                  >
+                    {uploading && uploadingTarget === 'video-entry' ? 'Uploading…' : 'Upload video'}
+                  </button>
+                  <input
+                    ref={videoInputRef}
+                    type="file"
+                    accept="video/mp4,video/quicktime,video/webm"
+                    className="admin-hidden-file-input"
+                    onChange={handleVideoEntryUpload}
+                  />
+                </div>
               </label>
 
               <label className="admin-field">
@@ -466,7 +556,7 @@ export default function FullAdminCms({
           {/* Profile Photo */}
           <div className="admin-panel">
             <h2>Profile Photo</h2>
-            <p>Upload via the Upload tab (folder: avatar), then paste the URL here.</p>
+            <p>Upload directly from your computer or paste a URL if you want.</p>
             {profileForm.avatarUrl && (
               <div style={{ margin: '12px 0' }}>
                 <img
@@ -478,12 +568,29 @@ export default function FullAdminCms({
             )}
             <label className="admin-field admin-field-full">
               <span>Avatar URL</span>
-              <input
-                placeholder="https://.../avatar.png"
-                type="url"
-                value={profileForm.avatarUrl}
-                onChange={(e) => setProfileForm((c) => ({ ...c, avatarUrl: e.target.value }))}
-              />
+              <div className="admin-inline-upload-row">
+                <input
+                  placeholder="https://.../avatar.png"
+                  type="url"
+                  value={profileForm.avatarUrl}
+                  onChange={(e) => setProfileForm((c) => ({ ...c, avatarUrl: e.target.value }))}
+                />
+                <button
+                  className="admin-secondary-btn"
+                  type="button"
+                  onClick={() => triggerFileInput(avatarInputRef)}
+                  disabled={uploading}
+                >
+                  {uploading && uploadingTarget === 'avatar' ? 'Uploading…' : 'Upload image'}
+                </button>
+                <input
+                  ref={avatarInputRef}
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp,image/gif"
+                  className="admin-hidden-file-input"
+                  onChange={handleAvatarUpload}
+                />
+              </div>
             </label>
             <label className="admin-field admin-field-full">
               <span>Alt text</span>
@@ -585,25 +692,59 @@ export default function FullAdminCms({
           {/* Hero Videos */}
           <div className="admin-panel">
             <h2>Hero Videos</h2>
-            <p>Upload via the Upload tab (folder: hero-videos), then paste the URLs here.</p>
+            <p>Upload directly from your computer or paste a URL.</p>
             <div className="admin-form-grid">
               <label className="admin-field admin-field-full">
                 <span>Primary video URL</span>
-                <input
-                  placeholder="https://.../video.mp4"
-                  type="url"
-                  value={heroVideoForm.primaryUrl}
-                  onChange={(e) => setHeroVideoForm((c) => ({ ...c, primaryUrl: e.target.value }))}
-                />
+                <div className="admin-inline-upload-row">
+                  <input
+                    placeholder="https://.../video.mp4"
+                    type="url"
+                    value={heroVideoForm.primaryUrl}
+                    onChange={(e) => setHeroVideoForm((c) => ({ ...c, primaryUrl: e.target.value }))}
+                  />
+                  <button
+                    className="admin-secondary-btn"
+                    type="button"
+                    onClick={() => triggerFileInput(heroPrimaryInputRef)}
+                    disabled={uploading}
+                  >
+                    {uploading && uploadingTarget === 'hero-primary' ? 'Uploading…' : 'Upload'}
+                  </button>
+                  <input
+                    ref={heroPrimaryInputRef}
+                    type="file"
+                    accept="video/mp4,video/quicktime,video/webm"
+                    className="admin-hidden-file-input"
+                    onChange={(e) => handleHeroVideoUpload(e, 'primary')}
+                  />
+                </div>
               </label>
               <label className="admin-field admin-field-full">
                 <span>Secondary video URL</span>
-                <input
-                  placeholder="https://.../video.mp4"
-                  type="url"
-                  value={heroVideoForm.secondaryUrl}
-                  onChange={(e) => setHeroVideoForm((c) => ({ ...c, secondaryUrl: e.target.value }))}
-                />
+                <div className="admin-inline-upload-row">
+                  <input
+                    placeholder="https://.../video.mp4"
+                    type="url"
+                    value={heroVideoForm.secondaryUrl}
+                    onChange={(e) => setHeroVideoForm((c) => ({ ...c, secondaryUrl: e.target.value }))}
+                  />
+                  <button
+                    className="admin-secondary-btn"
+                    type="button"
+                    onClick={() => triggerFileInput(heroSecondaryInputRef)}
+                    disabled={uploading}
+                  >
+                    {uploading && uploadingTarget === 'hero-secondary' ? 'Uploading…' : 'Upload'}
+                  </button>
+                  <input
+                    ref={heroSecondaryInputRef}
+                    type="file"
+                    accept="video/mp4,video/quicktime,video/webm"
+                    className="admin-hidden-file-input"
+                    onChange={(e) => handleHeroVideoUpload(e, 'secondary')}
+                  />
+                </div>
               </label>
             </div>
             <button className="admin-primary-btn" type="button" onClick={saveHeroVideos}>
@@ -614,7 +755,7 @@ export default function FullAdminCms({
           {/* Brand Logos */}
           <div className="admin-panel" style={{ gridColumn: '1 / -1' }}>
             <h2>Brand Logos</h2>
-            <p>Upload via the Upload tab (folder: logos). Logos will auto-populate here after upload.</p>
+            <p>Upload logos directly from your computer or paste URLs.</p>
 
             <div className="admin-brand-list">
               {brandsForm.map((logo, index) => (
@@ -632,12 +773,23 @@ export default function FullAdminCms({
                     onChange={(e) => updateBrandLogo(index, 'name', e.target.value)}
                     className="admin-brand-input"
                   />
-                  <input
-                    placeholder="Logo URL"
-                    value={logo.src}
-                    onChange={(e) => updateBrandLogo(index, 'src', e.target.value)}
-                    className="admin-brand-input admin-brand-url"
-                  />
+                  <div className="admin-inline-upload-row admin-brand-upload-row">
+                    <input
+                      placeholder="Logo URL"
+                      value={logo.src}
+                      onChange={(e) => updateBrandLogo(index, 'src', e.target.value)}
+                      className="admin-brand-input admin-brand-url"
+                    />
+                    <label className="admin-secondary-btn admin-inline-upload-btn">
+                      {uploading && uploadingTarget === `logo-${index}` ? 'Uploading…' : 'Upload'}
+                      <input
+                        type="file"
+                        accept="image/png,image/jpeg,image/webp,image/gif"
+                        className="admin-hidden-file-input"
+                        onChange={(e) => handleBrandLogoUpload(e, index)}
+                      />
+                    </label>
+                  </div>
                   <button
                     className="admin-danger-btn admin-brand-remove"
                     type="button"

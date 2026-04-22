@@ -1665,6 +1665,34 @@ textarea {
   padding: 0 !important;
 }
 
+/* ===== Admin: Inline Uploads ===== */
+.admin-inline-upload-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-inline-upload-row input[type="url"],
+.admin-inline-upload-row input[type="text"] {
+  flex: 1;
+}
+
+.admin-hidden-file-input {
+  display: none;
+}
+
+.admin-inline-upload-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.admin-brand-upload-row {
+  flex: 1;
+}
+
 /* ===== Admin: Empty State ===== */
 .admin-empty {
   color: #888;
@@ -1672,3 +1700,11 @@ textarea {
   text-align: center;
   padding: 40px 20px;
 }
+
+@media (max-width: 720px) {
+  .admin-inline-upload-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
