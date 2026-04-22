@@ -13,7 +13,7 @@ import {
 } from '@/lib/supabase'
 import type { DbVideo } from '@/lib/supabase'
 
-export const revalidate = 3600
+export const dynamic = 'force-dynamic'
 
 const CATEGORY_ORDER = ['Travel', 'Apps', 'Tech', 'Health & Fitness', 'AI']
 

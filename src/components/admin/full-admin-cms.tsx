@@ -280,17 +280,24 @@ export default function FullAdminCms({
     }
 
     if (uploadFolder === 'avatar') {
-      setProfileForm((prev) => ({ ...prev, avatarUrl: payload.url }))
+      const nextProfile = { ...profileForm, avatarUrl: payload.url }
+      setProfileForm(nextProfile)
+      await saveConfig('profile', nextProfile)
     } else if (uploadFolder === 'hero-videos') {
+      let nextHeroVideos = heroVideoForm
       if (!heroVideoForm.primaryUrl) {
-        setHeroVideoForm((prev) => ({ ...prev, primaryUrl: payload.url }))
+        nextHeroVideos = { ...heroVideoForm, primaryUrl: payload.url }
       } else if (!heroVideoForm.secondaryUrl) {
-        setHeroVideoForm((prev) => ({ ...prev, secondaryUrl: payload.url }))
+        nextHeroVideos = { ...heroVideoForm, secondaryUrl: payload.url }
       }
+      setHeroVideoForm(nextHeroVideos)
+      await saveConfig('videos', nextHeroVideos)
     } else if (uploadFolder === 'videos') {
       setVideoForm((prev) => ({ ...prev, url: payload.url, storage_path: payload.path }))
     } else if (uploadFolder === 'logos') {
-      setBrandsForm((prev) => [...prev, { name: file.name.replace(/\.[^.]+$/, ''), src: payload.url }])
+      const nextBrands = [...brandsForm, { name: file.name.replace(/\.[^.]+$/, ''), src: payload.url }]
+      setBrandsForm(nextBrands)
+      await saveConfig('brands', { title: 'Proudly working with…', logos: nextBrands })
     }
 
     event.target.value = ''
@@ -301,7 +308,9 @@ export default function FullAdminCms({
     if (!file) return
     const payload = await uploadFile(file, 'avatar', 'avatar')
     if (payload) {
-      setProfileForm((prev) => ({ ...prev, avatarUrl: payload.url }))
+      const nextProfile = { ...profileForm, avatarUrl: payload.url }
+      setProfileForm(nextProfile)
+      await saveConfig('profile', nextProfile)
     }
     event.target.value = ''
   }
@@ -311,10 +320,12 @@ export default function FullAdminCms({
     if (!file) return
     const payload = await uploadFile(file, 'hero-videos', `hero-${slot}`)
     if (payload) {
-      setHeroVideoForm((prev) => ({
-        ...prev,
+      const nextHeroVideos = {
+        ...heroVideoForm,
         [slot === 'primary' ? 'primaryUrl' : 'secondaryUrl']: payload.url,
-      }))
+      }
+      setHeroVideoForm(nextHeroVideos)
+      await saveConfig('videos', nextHeroVideos)
     }
     event.target.value = ''
   }
@@ -324,9 +335,39 @@ export default function FullAdminCms({
     if (!file) return
     const payload = await uploadFile(file, 'videos', 'video-entry')
     if (payload) {
-      setVideoForm((prev) => ({ ...prev, url: payload.url, storage_path: payload.path }))
-      if (!videoForm.title) {
-        setVideoForm((prev) => ({ ...prev, title: file.name.replace(/\.[^.]+$/, '') }))
+      const nextVideo = {
+        id: videoForm.id,
+        title: videoForm.title || file.name.replace(/\.[^.]+$/, ''),
+        caption: videoForm.caption,
+        category: videoForm.category,
+        url: payload.url,
+        featured: videoForm.featured,
+        sort_order: videoForm.sort_order,
+        storage_path: payload.path,
+      }
+
+      setVideoForm(nextVideo)
+
+      const response = await fetch('/api/admin/videos', {
+        method: nextVideo.id ? 'PATCH' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...nextVideo,
+          title: nextVideo.title.trim() || null,
+          caption: nextVideo.caption.trim() || null,
+          storage_path: nextVideo.storage_path.trim() || null,
+          sort_order: Number(nextVideo.sort_order) || 0,
+        }),
+      })
+
+      const result = await response.json().catch(() => null)
+      if (!response.ok) {
+        setError(result?.error ?? 'Could not save uploaded video.')
+      } else {
+        setVideos((result?.videos ?? []) as DbVideo[])
+        setStatus('Video uploaded and saved.')
+        resetVideoForm()
+        startTransition(() => router.refresh())
       }
     }
     event.target.value = ''
@@ -337,15 +378,14 @@ export default function FullAdminCms({
     if (!file) return
     const payload = await uploadFile(file, 'logos', `logo-${index}`)
     if (payload) {
-      setBrandsForm((prev) => {
-        const next = [...prev]
-        const current = next[index] ?? { name: '', src: '' }
-        next[index] = {
-          name: current.name || file.name.replace(/\.[^.]+$/, ''),
-          src: payload.url,
-        }
-        return next
-      })
+      const next = [...brandsForm]
+      const current = next[index] ?? { name: '', src: '' }
+      next[index] = {
+        name: current.name || file.name.replace(/\.[^.]+$/, ''),
+        src: payload.url,
+      }
+      setBrandsForm(next)
+      await saveConfig('brands', { title: 'Proudly working with…', logos: next })
     }
     event.target.value = ''
   }
