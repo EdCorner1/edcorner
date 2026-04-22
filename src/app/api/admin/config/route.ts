@@ -1,22 +1,46 @@
 import { NextResponse } from 'next/server'
 import { hasAdminSession } from '@/lib/admin-auth'
-import { getAdminSupabase } from '@/lib/admin-supabase'
-import type { SiteConfigId } from '@/lib/supabase'
+import { getAdminSupabase, STORAGE_BUCKET } from '@/lib/admin-supabase'
+import { SITE_CONFIG_PATH, type SiteConfigId } from '@/lib/supabase'
 
 const VALID_IDS: SiteConfigId[] = ['hero', 'profile', 'brands', 'metrics', 'videos']
 
+type SiteConfigMap = Partial<Record<SiteConfigId, Record<string, unknown>>>
+
+async function readConfigFromStorage() {
+  const adminSupabase = getAdminSupabase()
+  const { data, error } = await adminSupabase.storage.from(STORAGE_BUCKET).download(SITE_CONFIG_PATH)
+
+  if (error || !data) return {} as SiteConfigMap
+
+  try {
+    const text = await data.text()
+    if (!text?.trim()) return {} as SiteConfigMap
+    const parsed = JSON.parse(text)
+    return (parsed && typeof parsed === 'object' ? parsed : {}) as SiteConfigMap
+  } catch {
+    return {} as SiteConfigMap
+  }
+}
+
+async function writeConfigToStorage(config: SiteConfigMap) {
+  const adminSupabase = getAdminSupabase()
+  const body = JSON.stringify(config, null, 2)
+
+  const { error } = await adminSupabase.storage
+    .from(STORAGE_BUCKET)
+    .upload(SITE_CONFIG_PATH, body, {
+      contentType: 'application/json',
+      upsert: true,
+    })
+
+  if (error) throw error
+}
+
 export async function GET() {
   try {
-    const adminSupabase = getAdminSupabase()
-    const { data, error } = await adminSupabase
-      .from('site_config')
-      .select('id, value, updated_at')
-
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 })
-    }
-
-    return NextResponse.json({ config: data })
+    const config = await readConfigFromStorage()
+    return NextResponse.json({ config })
   } catch (error) {
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Unexpected error.' },
@@ -42,16 +66,11 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ error: 'value must be a JSON object' }, { status: 400 })
     }
 
-    const adminSupabase = getAdminSupabase()
-    const { error } = await adminSupabase
-      .from('site_config')
-      .upsert({ id, value }, { onConflict: 'id' })
+    const current = await readConfigFromStorage()
+    current[id as SiteConfigId] = value
+    await writeConfigToStorage(current)
 
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 })
-    }
-
-    return NextResponse.json({ ok: true })
+    return NextResponse.json({ ok: true, config: current })
   } catch (error) {
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Unexpected error.' },

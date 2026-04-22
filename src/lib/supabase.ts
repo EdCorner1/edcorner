@@ -63,39 +63,31 @@ export async function getAllVideos(): Promise<DbVideo[]> {
   return data as unknown as DbVideo[]
 }
 
-/* ========== Site Config ========== */
+/* ========== Site Config (stored in Supabase Storage JSON) ========== */
 
 export type SiteConfigId = 'hero' | 'profile' | 'brands' | 'metrics' | 'videos'
+export type SiteConfigMap = Partial<Record<SiteConfigId, Record<string, unknown>>>
 
-export type SiteConfigRecord = {
-  id: SiteConfigId
-  value: Record<string, unknown>
-  updated_at: string
+export const SITE_CONFIG_PATH = 'config/site-config.json'
+
+export async function getAllSiteConfig(): Promise<SiteConfigMap> {
+  try {
+    const { data, error } = await supabase.storage.from(STORAGE_BUCKET).download(SITE_CONFIG_PATH)
+    if (error || !data) return {}
+
+    const text = await data.text()
+    if (!text?.trim()) return {}
+
+    const parsed = JSON.parse(text)
+    return (parsed && typeof parsed === 'object' ? parsed : {}) as SiteConfigMap
+  } catch {
+    return {}
+  }
 }
 
 export async function getSiteConfig(id: SiteConfigId): Promise<Record<string, unknown> | null> {
-  const { data, error } = await supabase
-    .from('site_config')
-    .select('id, value, updated_at')
-    .eq('id', id)
-    .single()
-
-  if (error || !data) return null
-  return (data as unknown as SiteConfigRecord).value
-}
-
-export async function getAllSiteConfig(): Promise<Partial<Record<SiteConfigId, Record<string, unknown>>>> {
-  const { data, error } = await supabase
-    .from('site_config')
-    .select('id, value, updated_at')
-
-  if (error || !data) return {}
-
-  const result = {} as Record<SiteConfigId, Record<string, unknown>>
-  for (const row of data as unknown as SiteConfigRecord[]) {
-    result[row.id] = row.value
-  }
-  return result
+  const config = await getAllSiteConfig()
+  return (config[id] as Record<string, unknown>) ?? null
 }
 
 /* ========== Storage URL helper ========== */
