@@ -1,18 +1,33 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
-import { mediaAssets } from '@/content/media'
+import { useState, useEffect } from 'react'
+
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? ''
+const DEFAULT_AVATAR = `${SUPABASE_URL}/storage/v1/object/public/edcorner-media/avatar/ed-avatar.png`
 
 export default function SiteHeader() {
   const [open, setOpen] = useState(false)
+  const [avatarUrl, setAvatarUrl] = useState<string>(DEFAULT_AVATAR)
+
+  useEffect(() => {
+    // Fetch the latest profile avatar from site_config
+    fetch('/api/site-config/profile')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.avatarUrl) setAvatarUrl(data.avatarUrl)
+      })
+      .catch(() => {
+        // Use default avatar
+      })
+  }, [])
 
   return (
     <header className="header-system-wrapper">
       <div className="header-shell">
         <div className="header-left-pill">
           <Link href="#top" className="header-avatar-link" onClick={() => setOpen(false)} aria-label="Back to top">
-            <img src={mediaAssets.avatar} alt="Ed" className="header-avatar" />
+            <img src={avatarUrl} alt="Ed" className="header-avatar" />
           </Link>
 
           <nav className={`nav-links-bricolage ${open ? 'active' : ''}`} id="nav-drawer" aria-label="Main navigation">

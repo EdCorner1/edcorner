@@ -1,16 +1,18 @@
 export type MediaSource = 'wordpress' | 'local' | 'cdn'
 
 /**
- * Switch this when you're ready to move away from WordPress-hosted assets.
- * - 'wordpress' (current)
- * - 'local' (files in /public/media/...)
- * - 'cdn' (Cloudflare Stream, Mux, Vimeo, or another CDN)
+ * Switch MEDIA_SOURCE to 'cdn' when using Supabase storage.
+ * The admin CMS writes to site_config + edcorner-media bucket,
+ * so the homepage reads dynamically from Supabase.
+ * This file is kept for the SiteHeader avatar fallback only.
  */
-export const MEDIA_SOURCE: MediaSource = 'wordpress'
+export const MEDIA_SOURCE: MediaSource = 'cdn'
 
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? ''
+const STORAGE_BUCKET = 'edcorner-media'
 const WORDPRESS_UPLOADS_BASE = 'https://edcorner.co.uk/wp-content/uploads'
 const LOCAL_MEDIA_BASE = '/media'
-const CDN_MEDIA_BASE = ''
+const CDN_MEDIA_BASE = `${SUPABASE_URL}/storage/v1/object/public/${STORAGE_BUCKET}`
 
 function mediaUrl(path: string): string {
   const normalizedPath = path.startsWith('/') ? path : `/${path}`
@@ -21,7 +23,7 @@ function mediaUrl(path: string): string {
 }
 
 export const mediaAssets = {
-  avatar: mediaUrl('/2026/03/cropped-Untitled-design-6.png'),
-  heroVideoPrimary: mediaUrl('/2026/03/d7c359c0cf243f029082205768b75922-1.mp4'),
-  heroVideoSecondary: mediaUrl('/2026/02/Video-1-with-captions.mp4'),
+  avatar: mediaUrl('/avatar/ed-avatar.png'),
+  heroVideoPrimary: mediaUrl('/hero-videos/hero-primary.mp4'),
+  heroVideoSecondary: mediaUrl('/hero-videos/hero-secondary.mp4'),
 } as const

@@ -5,6 +5,8 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
+export const STORAGE_BUCKET = 'edcorner-media'
+
 export const VIDEO_BASE_COLUMNS = [
   'id',
   'url',
@@ -28,6 +30,8 @@ export type DbVideo = {
   sort_order: number
   storage_path?: string | null
 }
+
+/* ========== Videos ========== */
 
 export async function getVideosByCategory(): Promise<Record<string, DbVideo[]>> {
   const { data, error } = await supabase
@@ -57,4 +61,46 @@ export async function getAllVideos(): Promise<DbVideo[]> {
 
   if (error || !data) return []
   return data as unknown as DbVideo[]
+}
+
+/* ========== Site Config ========== */
+
+export type SiteConfigId = 'hero' | 'profile' | 'brands' | 'metrics' | 'videos'
+
+export type SiteConfigRecord = {
+  id: SiteConfigId
+  value: Record<string, unknown>
+  updated_at: string
+}
+
+export async function getSiteConfig(id: SiteConfigId): Promise<Record<string, unknown> | null> {
+  const { data, error } = await supabase
+    .from('site_config')
+    .select('id, value, updated_at')
+    .eq('id', id)
+    .single()
+
+  if (error || !data) return null
+  return (data as unknown as SiteConfigRecord).value
+}
+
+export async function getAllSiteConfig(): Promise<Partial<Record<SiteConfigId, Record<string, unknown>>>> {
+  const { data, error } = await supabase
+    .from('site_config')
+    .select('id, value, updated_at')
+
+  if (error || !data) return {}
+
+  const result = {} as Record<SiteConfigId, Record<string, unknown>>
+  for (const row of data as unknown as SiteConfigRecord[]) {
+    result[row.id] = row.value
+  }
+  return result
+}
+
+/* ========== Storage URL helper ========== */
+
+export function getPublicUrl(storagePath: string): string {
+  const { data } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(storagePath)
+  return data?.publicUrl ?? ''
 }
