@@ -7,10 +7,17 @@ export const dynamic = 'force-dynamic'
 export default async function AdminPage() {
   await requireAdminPageAuth()
 
-  const [videos, config] = await Promise.all([
-    getAllVideos(),
-    getAllSiteConfig(),
-  ])
+  let videos: Awaited<ReturnType<typeof getAllVideos>> = []
+  let config: Awaited<ReturnType<typeof getAllSiteConfig>> = {}
+
+  try {
+    ;[videos, config] = await Promise.all([
+      getAllVideos(),
+      getAllSiteConfig(),
+    ])
+  } catch (error) {
+    console.error('Failed to load admin data:', error)
+  }
 
   return <FullAdminCms initialVideos={videos} initialConfig={config} />
 }

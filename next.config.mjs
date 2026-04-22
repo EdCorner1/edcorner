@@ -3,7 +3,6 @@ const nextConfig = {
   images: {
     domains: ['images.unsplash.com'],
   },
-  outputFileTracingRoot: '/home/node/.openclaw/workspace/edcorner-site',
   async headers() {
     return [
       {

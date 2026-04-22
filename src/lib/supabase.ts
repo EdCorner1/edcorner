@@ -3,6 +3,13 @@ import { createClient } from '@supabase/supabase-js'
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error(
+    'Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY. ' +
+    'Add them to .env.local or Vercel environment variables.'
+  )
+}
+
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 export const STORAGE_BUCKET = 'edcorner-media'
@@ -73,6 +80,7 @@ export const SITE_CONFIG_PATH = 'config/site-config.json'
 export async function getAllSiteConfig(): Promise<SiteConfigMap> {
   try {
     const { data, error } = await supabase.storage.from(STORAGE_BUCKET).download(SITE_CONFIG_PATH)
+
     if (error || !data) return {}
 
     const text = await data.text()
