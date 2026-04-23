@@ -96,6 +96,9 @@ export default function FullAdminCms({
   const [uploadFolder, setUploadFolder] = useState('videos')
   const [uploading, setUploading] = useState(false)
   const [uploadingTarget, setUploadingTarget] = useState<string | null>(null)
+  const [quickVideoCategory, setQuickVideoCategory] = useState<(typeof CATEGORY_OPTIONS)[number]>('Tech')
+  const [quickVideoFeatured, setQuickVideoFeatured] = useState(false)
+  const [quickVideoCaption, setQuickVideoCaption] = useState('')
 
   const avatarInputRef = useRef<HTMLInputElement | null>(null)
   const heroPrimaryInputRef = useRef<HTMLInputElement | null>(null)
@@ -293,7 +296,31 @@ export default function FullAdminCms({
       setHeroVideoForm(nextHeroVideos)
       await saveConfig('videos', nextHeroVideos)
     } else if (uploadFolder === 'videos') {
-      setVideoForm((prev) => ({ ...prev, url: payload.url, storage_path: payload.path }))
+      const fallbackOrder = videos.length
+      const autoVideo = {
+        title: file.name.replace(/\.[^.]+$/, ''),
+        caption: quickVideoCaption.trim() || null,
+        category: quickVideoCategory,
+        url: payload.url,
+        featured: quickVideoFeatured,
+        sort_order: fallbackOrder,
+        storage_path: payload.path,
+      }
+
+      const response = await fetch('/api/admin/videos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(autoVideo),
+      })
+
+      const result = await response.json().catch(() => null)
+      if (!response.ok) {
+        setError(result?.error ?? 'Uploaded file but failed to create video entry.')
+      } else {
+        setVideos((result?.videos ?? []) as DbVideo[])
+        setStatus('Video uploaded and added to CMS.')
+        startTransition(() => router.refresh())
+      }
     } else if (uploadFolder === 'logos') {
       const nextBrands = [...brandsForm, { name: file.name.replace(/\.[^.]+$/, ''), src: payload.url }]
       setBrandsForm(nextBrands)
@@ -335,14 +362,15 @@ export default function FullAdminCms({
     if (!file) return
     const payload = await uploadFile(file, 'videos', 'video-entry')
     if (payload) {
+      const fallbackOrder = videos.length
       const nextVideo = {
         id: videoForm.id,
         title: videoForm.title || file.name.replace(/\.[^.]+$/, ''),
-        caption: videoForm.caption,
-        category: videoForm.category,
+        caption: videoForm.caption || quickVideoCaption,
+        category: videoForm.category || quickVideoCategory,
         url: payload.url,
-        featured: videoForm.featured,
-        sort_order: videoForm.sort_order,
+        featured: videoForm.featured || quickVideoFeatured,
+        sort_order: Number(videoForm.sort_order) || fallbackOrder,
         storage_path: payload.path,
       }
 
@@ -367,6 +395,7 @@ export default function FullAdminCms({
         setVideos((result?.videos ?? []) as DbVideo[])
         setStatus('Video uploaded and saved.')
         resetVideoForm()
+        setQuickVideoCaption('')
         startTransition(() => router.refresh())
       }
     }
@@ -870,6 +899,38 @@ export default function FullAdminCms({
               </select>
             </label>
 
+            {uploadFolder === 'videos' && (
+              <div className="admin-form-grid" style={{ marginBottom: 12 }}>
+                <label className="admin-field">
+                  <span>Quick category for uploaded videos</span>
+                  <select
+                    value={quickVideoCategory}
+                    onChange={(e) => setQuickVideoCategory(e.target.value as (typeof CATEGORY_OPTIONS)[number])}
+                  >
+                    {CATEGORY_OPTIONS.map((cat) => (
+                      <option key={cat} value={cat}>{cat}</option>
+                    ))}
+                  </select>
+                </label>
+                <label className="admin-field">
+                  <span>Quick caption (optional)</span>
+                  <input
+                    placeholder="Optional caption"
+                    value={quickVideoCaption}
+                    onChange={(e) => setQuickVideoCaption(e.target.value)}
+                  />
+                </label>
+                <label className="admin-checkbox-row" style={{ alignSelf: 'end', marginBottom: 8 }}>
+                  <input
+                    checked={quickVideoFeatured}
+                    type="checkbox"
+                    onChange={(e) => setQuickVideoFeatured(e.target.checked)}
+                  />
+                  <span>Mark uploaded videos as featured</span>
+                </label>
+              </div>
+            )}
+
             <label className="admin-upload-zone">
               <input
                 type="file"
@@ -884,11 +945,11 @@ export default function FullAdminCms({
             </label>
 
             <div className="admin-upload-hint">
-              <p><strong>Videos:</strong> Use folder "videos" — auto-fills the video form URL</p>
-              <p><strong>Logos:</strong> Use folder "logos" — auto-adds to brand logos list</p>
-              <p><strong>Profile photo:</strong> Use folder "avatar" — auto-fills the profile URL</p>
-              <p><strong>Hero videos:</strong> Use folder "hero-videos" — auto-fills hero video URLs</p>
-              <p>Max 50MB. Supported: PNG, JPEG, WebP, GIF, MP4, MOV, WebM</p>
+              <p><strong>Videos:</strong> Use folder "videos" — uploads and auto-creates a CMS video entry using quick defaults above.</p>
+              <p><strong>Logos:</strong> Use folder "logos" — auto-adds to brand logos list.</p>
+              <p><strong>Profile photo:</strong> Use folder "avatar" — auto-fills the profile URL.</p>
+              <p><strong>Hero videos:</strong> Use folder "hero-videos" — auto-fills hero video URLs.</p>
+              <p>Max 250MB. Supported: PNG, JPEG, WebP, GIF, SVG, MP4, MOV, WebM.</p>
             </div>
           </div>
         </div>
