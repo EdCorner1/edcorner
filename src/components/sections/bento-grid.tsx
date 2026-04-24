@@ -12,9 +12,9 @@ const projects: Project[] = [
   {
     icon: '▶️',
     label: 'YouTube',
-    title: 'Letting Openclaw Control My Life for 30 Days',
+    title: 'Building a creator business with AI tools',
     description:
-      "I'm handing my daily operations to an AI for 30 days — building, shipping, and automating everything with OpenClaw. Follow the experiment on YouTube.",
+      'Behind-the-scenes videos on content systems, automation, and what is actually working right now for tech creators.',
     cta: 'Watch on YouTube',
     href: 'https://youtube.com/@thisisedcorner',
   },
@@ -23,7 +23,7 @@ const projects: Project[] = [
     label: 'Newsletter',
     title: 'The Tech Creators Newsletter',
     description:
-      "Weekly drops on what's working in tech UGC — brand deals, creator tactics, AI tools, and opportunities you can actually act on.",
+      'Weekly breakdowns on brand deals, winning hooks, and practical growth tactics for tech UGC creators.',
     cta: 'Subscribe free',
     href: 'https://newsletter.edcorner.co.uk',
   },
@@ -32,16 +32,16 @@ const projects: Project[] = [
     label: 'Podcast',
     title: 'The Tech Creators Club',
     description:
-      'Conversations with top UGC creators and tech founders. Learn how they built their audiences, landed deals, and think about content.',
+      'Honest conversations with creators and founders about audience growth, monetisation, and building in public.',
     cta: 'Listen now',
     href: 'https://newsletter.edcorner.co.uk',
   },
   {
     icon: '⚡',
-    label: 'Coming Soon',
+    label: 'Product',
     title: 'Otto UGC',
     description:
-      'A UGC marketplace built specifically for tech and AI creators. Connect with brands, manage deals, and grow your creator business — all in one place.',
+      'A marketplace for tech and AI UGC creators to find aligned brands, manage deals, and scale repeat work.',
     cta: 'Join waitlist',
     href: 'https://otto.edcorner.co.uk',
     badge: 'Coming soon',
@@ -58,6 +58,8 @@ export default function BentoGrid({ headline }: { headline: string }) {
           <a
             key={project.title}
             href={project.href}
+            target="_blank"
+            rel="noopener noreferrer"
             className={`bento-card ${project.badge ? 'bento-card--upcoming' : ''}`}
           >
             {project.badge && <span className="bento-badge">{project.badge}</span>}

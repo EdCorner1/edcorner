@@ -136,10 +136,10 @@ textarea {
 .hero {
   width: 96%;
   max-width: 1400px;
-  margin: 28px auto 48px;
+  margin: 28px auto 56px;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 30px;
+  gap: 34px;
   align-items: center;
 }
 
@@ -198,24 +198,46 @@ textarea {
 
 .hero-copy {
   margin: 20px 0 0;
-  max-width: 50ch;
-  font-size: clamp(1.2rem, 1.7vw, 1.8rem);
-  line-height: 1.45;
+  max-width: 52ch;
+  font-size: clamp(1.08rem, 1.45vw, 1.4rem);
+  line-height: 1.58;
   color: #555;
 }
 
-.hero-ctas { margin-top: 24px; }
+.hero-ctas {
+  margin-top: 24px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
 
-.btn-neon {
+.btn-neon,
+.btn-ghost {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: #ccff00;
-  color: #2e2e2e;
   padding: 14px 24px;
   border-radius: 999px;
   font-weight: 700;
-  font-size: 21px;
+  font-size: clamp(16px, 1.2vw, 21px);
+  transition: transform 0.16s ease, box-shadow 0.16s ease, opacity 0.16s ease;
+}
+
+.btn-neon {
+  background: #ccff00;
+  color: #2e2e2e;
+  box-shadow: 0 8px 20px rgba(170, 220, 0, 0.3);
+}
+
+.btn-ghost {
+  background: #fff;
+  color: #1f232a;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.btn-neon:hover,
+.btn-ghost:hover {
+  transform: translateY(-1px);
 }
 
 .hero-right {
@@ -392,6 +414,8 @@ textarea {
   letter-spacing: -0.04em;
   line-height: 1.05;
   color: #1f1f1f;
+  max-width: 24ch;
+  margin-inline: auto;
 }
 
 .portfolio-grid {
@@ -692,6 +716,14 @@ textarea {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
+}
+
+.admin-quick-video-grid {
+  margin-bottom: 10px;
+}
+
+.admin-quick-featured-row {
+  margin: 0 0 14px;
 }
 
 .admin-field {
@@ -1041,7 +1073,8 @@ textarea {
   .intro-avatar { width: 40px; height: 40px; }
   .hero-left h1 { font-size: clamp(2.8rem, 14vw, 4.1rem); }
   .hero-copy { font-size: 1rem; }
-  .btn-neon { font-size: 16px; padding: 12px 18px; }
+  .btn-neon,
+  .btn-ghost { font-size: 16px; padding: 12px 18px; }
   .v1 { max-width: 250px; max-height: 450px; }
 
   .brands-section { margin-top: 0; }

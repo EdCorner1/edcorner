@@ -4,32 +4,32 @@ import { useState } from 'react'
 
 const faqs = [
   {
-    q: 'So what actually is UGC?',
-    a: "UGC stands for User Generated Content. It's video content created by real people — not actors, not polished ads — that feels like something a friend would send you. Brands love it because it cuts through the ad noise. I love it because it pays.",
+    q: 'What does working together look like?',
+    a: 'You send the brief, goals, and product context. I handle concepting, scripting, filming, and edits, then deliver ready-to-use assets in vertical formats.',
   },
   {
-    q: 'Are you like an influencer?',
-    a: "Sort of, but different. Influencers build audiences and post brand content to their own followers. I create content for brands — they use it in their ads, on their website, across their channels. My face, their product, their campaign.",
+    q: 'What types of brands do you work best with?',
+    a: 'Mostly AI, SaaS, mobile app, and tech-enabled consumer brands that care about performance and want creative that feels native to the platform.',
   },
   {
-    q: "Where do you buy all your hats from?",
-    a: "Everywhere. Zara, Cos, Asos, Amazon, markets. I've been asked about three specific hats this month so I'm starting to think I have a problem.",
+    q: 'What deliverables can you provide?',
+    a: 'Hook-first ad creatives, organic-style UGC, product demos, testimonials, voiceover variants, and cutdowns for testing different angles.',
   },
   {
-    q: "What kind of content do you make?",
-    a: "Short form mostly — TikToks, YouTube Shorts, Instagram Reels. But I've done longer tutorials, product demo reels, LinkedIn content, and testimonial-style pieces. If it fits in a vertical frame and holds attention, I'm in.",
+    q: 'Can we run this as paid media?',
+    a: 'Yes. Most clients license content for paid social, landing pages, and email campaigns. Usage rights and term length are agreed before production.',
   },
   {
-    q: "So do we post on my account or yours?",
-    a: "Depends on the brief. Usually the brand gets the rights to use the content in their own ads — that means paid social, website, email. Sometimes we post to my profile as well, which gives it extra reach. We'll agree on the usage in the proposal.",
+    q: 'How fast is turnaround?',
+    a: 'Standard turnaround is 3–5 days from approved brief. Rush delivery is possible depending on schedule and project scope.',
   },
   {
-    q: "How do you measure success?",
-    a: "Views, engagement, click-throughs, conversions — whatever the campaign goal is. I track everything and report back at the end. If the content isn't performing, I'll tell you why and what we'd change next time.",
+    q: 'How do you measure success?',
+    a: 'Success is tied to your objective: watch time, CTR, CVR, CPA, or revenue. We align on KPIs upfront and iterate based on real performance data.',
   },
   {
-    q: "How quickly can you turn content around?",
-    a: "My standard turnaround is 3–5 days from brief to finished files. Rush turnarounds can usually be accommodated — just ask upfront and I'll let you know what's possible.",
+    q: 'How do we get started?',
+    a: 'Use the contact form or book a call. I will review your goals and propose a clear scope, timeline, and pricing before anything starts.',
   },
 ]
 

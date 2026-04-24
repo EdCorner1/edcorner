@@ -31,8 +31,9 @@ export default function SiteHeader() {
           </Link>
 
           <nav className={`nav-links-bricolage ${open ? 'active' : ''}`} id="nav-drawer" aria-label="Main navigation">
-            <Link href="#portfolio" onClick={() => setOpen(false)}>Recent Work</Link>
-            <Link href="#about" onClick={() => setOpen(false)}>About Me</Link>
+            <Link href="#portfolio" onClick={() => setOpen(false)}>Work</Link>
+            <Link href="#about" onClick={() => setOpen(false)}>Services</Link>
+            <Link href="#faq" onClick={() => setOpen(false)}>FAQ</Link>
             <Link href="#getintouch" onClick={() => setOpen(false)}>Contact</Link>
           </nav>
 
@@ -58,6 +59,7 @@ export default function SiteHeader() {
             data-cal-config='{"layout":"month_view","useSlotsViewOnSmallScreen":true}'
             style={{ border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 'inherit' }}
             type="button"
+            aria-label="Book a discovery call"
           >
             Book a call
           </button>

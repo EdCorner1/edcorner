@@ -76,7 +76,7 @@ export default function ContactSection() {
 
   return (
     <section className="contact-section" id="getintouch">
-      <h2 className="contact-headline">Have a project in mind?</h2>
+      <h2 className="contact-headline">Ready to plan your next campaign?</h2>
 
       <div className="contact-grid">
         <div className="contact-form-wrap">
@@ -93,7 +93,7 @@ export default function ContactSection() {
                 <input
                   id="contact-name"
                   type="text"
-                  placeholder="Dwayne Johnson"
+                  placeholder="Your name"
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
                   required
@@ -104,7 +104,7 @@ export default function ContactSection() {
                 <input
                   id="contact-email"
                   type="email"
-                  placeholder="paper@scissors.com"
+                  placeholder="you@company.com"
                   value={form.email}
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
                   required
@@ -114,15 +114,15 @@ export default function ContactSection() {
                 <label htmlFor="contact-project">Project Information</label>
                 <textarea
                   id="contact-project"
-                  placeholder="Tell me what you need, your timeline, and the kind of content you want."
+                  placeholder="Share goals, timeline, channels, and what success looks like."
                   rows={5}
                   value={form.project}
                   onChange={(e) => setForm({ ...form, project: e.target.value })}
                   required
                 />
               </div>
-              <button type="submit" className="contact-submit">Send via email</button>
-              <p className="contact-note">This opens your email app with the details filled in.</p>
+              <button type="submit" className="contact-submit">Send project brief</button>
+              <p className="contact-note">This opens your email app with the details pre-filled.</p>
             </form>
           )}
         </div>

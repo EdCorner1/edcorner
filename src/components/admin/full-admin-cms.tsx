@@ -113,6 +113,46 @@ export default function FullAdminCms({
     setError(null)
   }
 
+  async function persistVideo(draft: {
+    id?: string
+    title?: string | null
+    caption?: string | null
+    category?: string
+    url: string
+    featured?: boolean
+    sort_order?: number
+    storage_path?: string | null
+  }) {
+    const payload = {
+      id: draft.id,
+      title: draft.title?.trim() || null,
+      caption: draft.caption?.trim() || null,
+      category: draft.category?.trim() || 'Tech',
+      url: draft.url.trim(),
+      featured: Boolean(draft.featured),
+      sort_order: Number(draft.sort_order ?? 0) || 0,
+      storage_path: draft.storage_path?.trim() || null,
+    }
+
+    const method = payload.id ? 'PATCH' : 'POST'
+    const response = await fetch('/api/admin/videos', {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    })
+
+    const result = await response.json().catch(() => null)
+
+    if (!response.ok) {
+      setError(result?.error ?? 'Could not save video.')
+      return false
+    }
+
+    setVideos((result?.videos ?? []) as DbVideo[])
+    startTransition(() => router.refresh())
+    return true
+  }
+
   /* ========== Video CRUD ========== */
 
   function resetVideoForm() {
@@ -136,29 +176,11 @@ export default function FullAdminCms({
     event.preventDefault()
     clearFeedback()
 
-    const method = videoForm.id ? 'PATCH' : 'POST'
-    const response = await fetch('/api/admin/videos', {
-      method,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        ...videoForm,
-        title: videoForm.title.trim() || null,
-        caption: videoForm.caption.trim() || null,
-        storage_path: videoForm.storage_path.trim() || null,
-        sort_order: Number(videoForm.sort_order) || 0,
-      }),
-    })
+    const saved = await persistVideo(videoForm)
+    if (!saved) return
 
-    const payload = await response.json().catch(() => null)
-    if (!response.ok) {
-      setError(payload?.error ?? 'Could not save video.')
-      return
-    }
-
-    setVideos((payload?.videos ?? []) as DbVideo[])
     setStatus(videoForm.id ? 'Video updated.' : 'Video created.')
     resetVideoForm()
-    startTransition(() => router.refresh())
   }
 
   async function deleteVideo(id: string) {
@@ -375,28 +397,12 @@ export default function FullAdminCms({
       }
 
       setVideoForm(nextVideo)
+      const saved = await persistVideo(nextVideo)
 
-      const response = await fetch('/api/admin/videos', {
-        method: nextVideo.id ? 'PATCH' : 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...nextVideo,
-          title: nextVideo.title.trim() || null,
-          caption: nextVideo.caption.trim() || null,
-          storage_path: nextVideo.storage_path.trim() || null,
-          sort_order: Number(nextVideo.sort_order) || 0,
-        }),
-      })
-
-      const result = await response.json().catch(() => null)
-      if (!response.ok) {
-        setError(result?.error ?? 'Could not save uploaded video.')
-      } else {
-        setVideos((result?.videos ?? []) as DbVideo[])
+      if (saved) {
         setStatus('Video uploaded and saved.')
         resetVideoForm()
         setQuickVideoCaption('')
-        startTransition(() => router.refresh())
       }
     }
     event.target.value = ''
@@ -436,7 +442,7 @@ export default function FullAdminCms({
   const navItems: { id: AdminView; label: string }[] = [
     { id: 'videos', label: 'Videos' },
     { id: 'site', label: 'Site Content' },
-    { id: 'upload', label: 'Upload Files' },
+    { id: 'upload', label: 'File Library' },
   ]
 
   return (
@@ -446,7 +452,7 @@ export default function FullAdminCms({
         <div>
           <span className="admin-eyebrow">Private dashboard</span>
           <h1>Ed Corner CMS</h1>
-          <p>Manage videos, brand logos, profile photo, and site content.</p>
+          <p>Fast updates for videos, homepage content, logos, and profile media.</p>
         </div>
 
         <div className="admin-header-actions">
@@ -491,13 +497,48 @@ export default function FullAdminCms({
         <div className="admin-grid">
           <form className="admin-panel admin-video-form" onSubmit={submitVideoForm}>
             <div className="admin-panel-header">
-              <h2>{videoForm.id ? 'Edit video' : 'Add a new video'}</h2>
+              <div>
+                <h2>{videoForm.id ? 'Edit video' : 'Add a new video'}</h2>
+                <p>Fast path: upload a video, then tweak title/caption only if needed.</p>
+              </div>
               {videoForm.id ? (
                 <button className="admin-text-btn" type="button" onClick={resetVideoForm}>
                   New entry
                 </button>
               ) : null}
             </div>
+
+            <div className="admin-form-grid admin-quick-video-grid">
+              <label className="admin-field">
+                <span>Quick category</span>
+                <select
+                  value={quickVideoCategory}
+                  onChange={(e) => setQuickVideoCategory(e.target.value as (typeof CATEGORY_OPTIONS)[number])}
+                >
+                  {CATEGORY_OPTIONS.map((cat) => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
+                </select>
+              </label>
+
+              <label className="admin-field">
+                <span>Quick caption (optional)</span>
+                <input
+                  placeholder="Optional caption"
+                  value={quickVideoCaption}
+                  onChange={(e) => setQuickVideoCaption(e.target.value)}
+                />
+              </label>
+            </div>
+
+            <label className="admin-checkbox-row admin-quick-featured-row">
+              <input
+                checked={quickVideoFeatured}
+                type="checkbox"
+                onChange={(e) => setQuickVideoFeatured(e.target.checked)}
+              />
+              <span>Feature newly uploaded videos</span>
+            </label>
 
             <div className="admin-form-grid">
               <label className="admin-field admin-field-full">
@@ -613,7 +654,7 @@ export default function FullAdminCms({
                   </div>
                 </article>
               ))}
-              {videos.length === 0 && <p className="admin-empty">No videos yet. Add one above or use the Upload tab.</p>}
+              {videos.length === 0 && <p className="admin-empty">No videos yet. Upload one above or create an entry manually.</p>}
             </div>
           </div>
         </div>

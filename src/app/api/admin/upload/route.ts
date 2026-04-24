@@ -2,18 +2,33 @@ import { NextResponse } from 'next/server'
 import { hasAdminSession } from '@/lib/admin-auth'
 import { getAdminSupabase, STORAGE_BUCKET } from '@/lib/admin-supabase'
 
-const ALLOWED_TYPES = [
-  'image/png',
-  'image/jpeg',
-  'image/webp',
-  'image/gif',
-  'image/svg+xml',
-  'video/mp4',
-  'video/quicktime',
-  'video/webm',
-]
+const ALLOWED_MIME_TO_EXTENSIONS: Record<string, string[]> = {
+  'image/png': ['png'],
+  'image/jpeg': ['jpg', 'jpeg'],
+  'image/webp': ['webp'],
+  'image/gif': ['gif'],
+  'image/svg+xml': ['svg'],
+  'video/mp4': ['mp4'],
+  'video/quicktime': ['mov', 'qt'],
+  'video/webm': ['webm'],
+}
 
+const ALLOWED_FOLDERS = new Set(['videos', 'logos', 'avatar', 'hero-videos', 'misc'])
 const MAX_SIZE = 250 * 1024 * 1024 // 250MB
+
+function sanitizeFolder(input: string) {
+  const normalized = input.trim().toLowerCase().replace(/[^a-z0-9-]/g, '')
+  return ALLOWED_FOLDERS.has(normalized) ? normalized : 'misc'
+}
+
+function sanitizeFilename(input: string) {
+  return input
+    .replace(/\.[^.]+$/, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9_-]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .replace(/-{2,}/g, '-') || 'file'
+}
 
 export async function POST(request: Request) {
   if (!(await hasAdminSession())) {
@@ -23,13 +38,14 @@ export async function POST(request: Request) {
   try {
     const formData = await request.formData()
     const file = formData.get('file') as File | null
-    const folder = (formData.get('folder') as string) || 'misc'
+    const folder = sanitizeFolder((formData.get('folder') as string) || 'misc')
 
     if (!file) {
       return NextResponse.json({ error: 'No file provided.' }, { status: 400 })
     }
 
-    if (!ALLOWED_TYPES.includes(file.type)) {
+    const allowedExtensions = ALLOWED_MIME_TO_EXTENSIONS[file.type]
+    if (!allowedExtensions) {
       return NextResponse.json({ error: `Unsupported file type: ${file.type}` }, { status: 400 })
     }
 
@@ -37,9 +53,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'File too large. Max 250MB.' }, { status: 400 })
     }
 
-    // Sanitize filename: replace spaces, keep extension
-    const ext = file.name.split('.').pop()?.toLowerCase() || 'bin'
-    const baseName = file.name.replace(/\.[^.]+$/, '').replace(/[^a-zA-Z0-9_-]/g, '-').toLowerCase()
+    const rawExt = file.name.split('.').pop()?.toLowerCase() || ''
+    const ext = allowedExtensions.includes(rawExt) ? rawExt : allowedExtensions[0]
+    const baseName = sanitizeFilename(file.name)
     const timestamp = Date.now()
     const storagePath = `${folder}/${baseName}-${timestamp}.${ext}`
 
@@ -65,6 +81,8 @@ export async function POST(request: Request) {
       url: urlData?.publicUrl ?? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${STORAGE_BUCKET}/${storagePath}`,
       size: file.size,
       type: file.type,
+      name: file.name,
+      folder,
     })
   } catch (error) {
     return NextResponse.json(
@@ -85,6 +103,15 @@ export async function DELETE(request: Request) {
 
     if (!path) {
       return NextResponse.json({ error: 'Missing path parameter.' }, { status: 400 })
+    }
+
+    if (path.includes('..')) {
+      return NextResponse.json({ error: 'Invalid path.' }, { status: 400 })
+    }
+
+    const [folder] = path.split('/')
+    if (!folder || !ALLOWED_FOLDERS.has(folder)) {
+      return NextResponse.json({ error: 'Invalid folder path.' }, { status: 400 })
     }
 
     const adminSupabase = getAdminSupabase()

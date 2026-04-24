@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import ContentTabs from '@/components/sections/content-tabs'
 import CreatorCards from '@/components/sections/creator-cards'
 import VideoTicker from '@/components/sections/video-ticker'
@@ -9,7 +10,6 @@ import ContactSection from '@/components/sections/contact-section'
 import {
   getVideosByCategory,
   getAllSiteConfig,
-  getPublicUrl,
 } from '@/lib/supabase'
 import type { DbVideo } from '@/lib/supabase'
 
@@ -40,7 +40,7 @@ const FALLBACK = {
     introName: "Hi, I'm Ed",
     titleLine1: 'UGC & Tech',
     titleLine2: 'Creator',
-    copy: 'Your new favourite AI & tech obsessed UGC creator from the UK with 6 years experience in all things product design, marketing & conversion rate optimisation.',
+    copy: 'I create performance-driven UGC for AI, app, and SaaS brands — built to hold attention and convert across paid and organic channels.',
     ctaLabel: 'Get in touch',
     ctaHref: '#getintouch',
   },
@@ -127,6 +127,7 @@ export default async function HomePage() {
 
           <div className="hero-ctas">
             <a className="btn-neon" href={String(hero.ctaHref)}>{String(hero.ctaLabel)}</a>
+            <Link className="btn-ghost" href="#portfolio">View recent work</Link>
           </div>
         </div>
 
@@ -191,25 +192,25 @@ export default async function HomePage() {
       )}
 
       <CreatorCards
-        headline="Not just a creator"
+        headline="How I help brands win with UGC"
         items={[
           {
             icon: '🎬',
-            label: 'The Content',
-            title: 'Vertical Content That Actually Sticks',
-            description: 'I create high-retention TikToks, Reels, and Shorts that feel like they belong on the FYP. No stiff ads—just authentic storytelling that builds a bridge between your product and the viewer.',
+            label: 'Creative',
+            title: 'Scroll-stopping vertical videos',
+            description: 'Native-feeling TikToks, Reels, and Shorts that blend into the feed, hook fast, and make the product the hero.',
           },
           {
             icon: '🧠',
-            label: 'The Strategy',
-            title: 'Psychology-Driven Creative Strategy',
-            description: "I don't guess; I analyze. I take a deep dive into your business to identify your core audience's pain points, using a library of 1,000+ proven viral hooks to ensure your message hits from the first second.",
+            label: 'Strategy',
+            title: 'Message-market fit before filming',
+            description: 'Each concept is built around audience pains, objections, and outcomes so the final cut is designed to convert — not just entertain.',
           },
           {
             icon: '🤝',
-            label: 'The Partnership',
-            title: 'Seamless Creative Collaboration',
-            description: 'I act as your creative partner, not just a vendor. From scripting to final edit, I handle the heavy lifting while ensuring every frame aligns with your brand goals and performance standards.',
+            label: 'Execution',
+            title: 'Reliable partner, not a one-off creator',
+            description: 'Fast communication, clean handover, and reusable assets your team can run across paid social, landing pages, and email.',
           },
         ]}
       />
@@ -222,7 +223,7 @@ export default async function HomePage() {
       )}
 
       <ReviewsTicker />
-      <BentoGrid headline="Other Projects" />
+      <BentoGrid headline="Explore more from Ed" />
       <FaqSection />
       <ContactSection />
       <SiteFooter />
